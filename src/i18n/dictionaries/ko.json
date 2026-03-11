@@ -15,7 +15,8 @@
   "home": {
     "recentPosts": "최근 게시물",
     "viewAll": "전체보기",
-    "noPosts": "아직 게시물이 없습니다."
+    "noPosts": "아직 게시물이 없습니다.",
+    "recentSidebar": "최근글"
   },
   "category": {
     "all": "전체",

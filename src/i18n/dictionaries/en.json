@@ -15,7 +15,8 @@
   "home": {
     "recentPosts": "Recent Posts",
     "viewAll": "View All",
-    "noPosts": "No posts yet."
+    "noPosts": "No posts yet.",
+    "recentSidebar": "Recent"
   },
   "category": {
     "all": "All",

@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { HeroBanner } from "@/components/home/HeroBanner";
 import { CategoryFilter } from "@/components/home/CategoryFilter";
+import { RecentPostsSidebar } from "@/components/home/RecentPostsSidebar";
 import { PostList } from "@/components/post/PostList";
 import { prisma } from "@/lib/prisma";
 import { getDictionary } from "@/i18n";
@@ -93,7 +94,12 @@ const Home = async ({
         <CategoryFilter dict={dict.category} />
       </Suspense>
 
-      <PostList posts={posts} />
+      <div className="mx-auto flex max-w-container gap-8 px-8 pb-16 pt-6">
+        <div className="min-w-0 flex-1">
+          <PostList posts={posts} bare />
+        </div>
+        <RecentPostsSidebar posts={posts} title={dict.home.recentSidebar} />
+      </div>
     </>
   );
 };

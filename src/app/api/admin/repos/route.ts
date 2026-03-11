@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createRepoWebhook } from "@/lib/github";
 import type { ApiResponse } from "@/types";
 
 const requireAdmin = async () => {
@@ -29,10 +30,20 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({ success: false, error: "owner and name are required" }, { status: 400 });
   }
 
+  let githubHookId: number | null = null;
+  try {
+    githubHookId = await createRepoWebhook(owner, name);
+  } catch (err) {
+    console.error(`GitHub webhook 생성 실패 (${owner}/${name}):`, err);
+  }
+
   const repo = await prisma.watchedRepo.create({
-    data: { owner, name, branch, autoPublish, promptTemplate },
+    data: { owner, name, branch, autoPublish, promptTemplate, githubHookId },
   });
 
-  const res: ApiResponse = { success: true, data: repo };
+  const res: ApiResponse = {
+    success: true,
+    data: { ...repo, webhookCreated: githubHookId !== null },
+  };
   return NextResponse.json(res, { status: 201 });
 };

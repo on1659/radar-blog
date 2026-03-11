@@ -74,6 +74,7 @@ model WatchedRepo {
   autoPublish     Boolean  @default(false)
   promptTemplate  String?
   categoryMapping String?
+  githubHookId    Int?
   createdAt       DateTime @default(now())
 
   @@unique([owner, name])

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { deleteRepoWebhook } from "@/lib/github";
 import type { ApiResponse } from "@/types";
 
 const requireAdmin = async () => {
@@ -32,6 +33,16 @@ export const DELETE = async (_req: NextRequest, { params }: RouteParams) => {
   }
 
   const { id } = await params;
+  const repo = await prisma.watchedRepo.findUnique({ where: { id } });
+
+  if (repo?.githubHookId) {
+    try {
+      await deleteRepoWebhook(repo.owner, repo.name, repo.githubHookId);
+    } catch (err) {
+      console.error(`GitHub webhook 삭제 실패:`, err);
+    }
+  }
+
   await prisma.watchedRepo.delete({ where: { id } });
 
   const res: ApiResponse = { success: true };

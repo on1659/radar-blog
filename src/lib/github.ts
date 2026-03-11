@@ -37,3 +37,38 @@ export const getRepoInfo = async (owner: string, repo: string) => {
     url: data.html_url,
   };
 };
+
+export const createRepoWebhook = async (owner: string, repo: string): Promise<number | null> => {
+  const webhookUrl = `${process.env.NEXTAUTH_URL}/api/webhooks/github`;
+  const secret = process.env.GITHUB_WEBHOOK_SECRET;
+
+  if (!secret) throw new Error("GITHUB_WEBHOOK_SECRET is not set");
+
+  try {
+    const { data } = await octokit.repos.createWebhook({
+      owner,
+      repo,
+      config: {
+        url: webhookUrl,
+        content_type: "json",
+        secret,
+        insecure_ssl: "0",
+      },
+      events: ["push"],
+      active: true,
+    });
+    return data.id;
+  } catch (error: unknown) {
+    // 이미 존재하는 경우 기존 훅 ID 반환
+    if ((error as { status?: number }).status === 422) {
+      const { data } = await octokit.repos.listWebhooks({ owner, repo });
+      const existing = data.find((h) => h.config.url === webhookUrl);
+      return existing?.id ?? null;
+    }
+    throw error;
+  }
+};
+
+export const deleteRepoWebhook = async (owner: string, repo: string, hookId: number): Promise<void> => {
+  await octokit.repos.deleteWebhook({ owner, repo, hook_id: hookId });
+};

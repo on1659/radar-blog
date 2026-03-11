@@ -92,6 +92,12 @@ model DailyAnalytics {
   @@index([postId])
 }
 
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 enum Category {
   commits
   articles

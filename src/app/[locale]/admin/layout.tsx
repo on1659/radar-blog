@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { LayoutDashboard, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, FileText, Settings, BarChart3 } from "lucide-react";
 
 const adminNav = [
   { label: "대시보드", href: "/admin", icon: LayoutDashboard },
   { label: "글 관리", href: "/admin/posts", icon: FileText },
+  { label: "통계", href: "/admin/analytics", icon: BarChart3 },
   { label: "설정", href: "/admin/settings", icon: Settings },
 ];
 

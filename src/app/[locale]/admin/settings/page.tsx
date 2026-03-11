@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Key, Plus, Trash2, GitBranch, Copy, Check, Info } from "lucide-react";
+import { Key, Plus, Trash2, GitBranch, Copy, Check, Info, RefreshCw, Webhook } from "lucide-react";
 
 interface ApiKeyItem {
   id: string;
@@ -34,6 +34,10 @@ const AdminSettingsPage = () => {
   const [editingPrompt, setEditingPrompt] = useState<string | null>(null);
   const [promptValue, setPromptValue] = useState("");
   const [showGuide, setShowGuide] = useState(false);
+  const [rehooking, setRehooking] = useState(false);
+  const [rehookResult, setRehookResult] = useState<string>("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string>("");
 
   const webhookUrl = typeof window !== "undefined"
     ? `${window.location.origin}/api/webhooks/github`
@@ -113,6 +117,39 @@ const AdminSettingsPage = () => {
     fetchData();
   };
 
+  const rehook = async () => {
+    setRehooking(true);
+    setRehookResult("");
+    try {
+      const res = await fetch("/api/admin/repos/rehook", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        setRehookResult(`완료: ${data.data.ok}/${data.data.total}개 webhook 설치`);
+        fetchData();
+      } else {
+        setRehookResult(`실패: ${data.error}`);
+      }
+    } catch { setRehookResult("오류가 발생했습니다."); }
+    finally { setRehooking(false); }
+  };
+
+  const syncRepos = async () => {
+    setSyncing(true);
+    setSyncResult("");
+    try {
+      const res = await fetch("/api/admin/repos/sync", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        const { newCount, added } = data.data;
+        setSyncResult(newCount > 0 ? `${newCount}개 추가됨: ${added.join(", ")}` : "새 레포 없음");
+        fetchData();
+      } else {
+        setSyncResult(`실패: ${data.error}`);
+      }
+    } catch { setSyncResult("오류가 발생했습니다."); }
+    finally { setSyncing(false); }
+  };
+
   const copyWebhookUrl = () => {
     navigator.clipboard.writeText(webhookUrl);
     setCopiedUrl(true);
@@ -171,6 +208,26 @@ const AdminSettingsPage = () => {
         <h2 className="mb-4 flex items-center gap-2 text-sub-heading">
           <GitBranch size={18} /> GitHub 감시 레포
         </h2>
+
+        {/* 액션 버튼 */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button onClick={rehook} disabled={rehooking}
+            className="flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-meta font-medium text-text-secondary transition-colors hover:border-brand-primary hover:text-brand-primary disabled:opacity-50">
+            <Webhook size={14} className={rehooking ? "animate-spin" : ""} />
+            {rehooking ? "설치 중..." : "Webhook 재설치"}
+          </button>
+          <button onClick={syncRepos} disabled={syncing}
+            className="flex items-center gap-1.5 rounded-lg border border-border px-4 py-2 text-meta font-medium text-text-secondary transition-colors hover:border-brand-primary hover:text-brand-primary disabled:opacity-50">
+            <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
+            {syncing ? "동기화 중..." : "레포 동기화"}
+          </button>
+        </div>
+        {rehookResult && (
+          <p className="mb-3 text-meta text-cat-commits">{rehookResult}</p>
+        )}
+        {syncResult && (
+          <p className="mb-3 text-meta text-cat-commits">{syncResult}</p>
+        )}
 
         {/* Webhook URL */}
         <div className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-bg-secondary px-4 py-3">

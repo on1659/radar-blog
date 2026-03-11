@@ -14,7 +14,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = session?.user as { isAdmin?: boolean } | undefined;
 
   if (!session || !user?.isAdmin) {
-    redirect("/");
+    redirect("/admin/login");
   }
 
   return (

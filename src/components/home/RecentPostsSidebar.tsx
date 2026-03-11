@@ -17,9 +17,9 @@ export const RecentPostsSidebar = ({ posts, title }: RecentPostsSidebarProps) =>
   if (posts.length === 0) return null;
 
   return (
-    <aside className="hidden w-[260px] flex-shrink-0 lg:block">
-      <div className="sticky top-24">
-        <h3 className="mb-4 text-[0.9375rem] font-bold tracking-[-0.01em]">
+    <aside className="w-full lg:w-[260px] lg:flex-shrink-0">
+      <div className="sticky top-24 rounded-xl border border-border-light bg-bg-secondary p-4">
+        <h3 className="mb-3 text-[0.9375rem] font-bold tracking-[-0.01em]">
           {title}
         </h3>
         <ul className="flex flex-col gap-1">

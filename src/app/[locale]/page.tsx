@@ -94,7 +94,7 @@ const Home = async ({
         <CategoryFilter dict={dict.category} />
       </Suspense>
 
-      <div className="mx-auto flex max-w-container gap-8 px-8 pb-16 pt-6">
+      <div className="mx-auto flex max-w-container flex-col gap-8 px-8 pb-16 pt-6 lg:flex-row">
         <div className="min-w-0 flex-1">
           <PostList posts={posts} bare />
         </div>

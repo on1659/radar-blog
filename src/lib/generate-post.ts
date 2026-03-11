@@ -1,7 +1,10 @@
+import { revalidatePath } from "next/cache";
 import { prisma } from "./prisma";
 import { getCommitDetail } from "./github";
 import { generateBlogContent } from "./claude";
 import { calculateReadingTime } from "./markdown";
+
+const DAILY_POST_CAP = 10;
 
 interface CommitData {
   id: string;
@@ -45,12 +48,29 @@ export const processCommits = async (
     return { processed: 0, skipped: true };
   }
 
+  // 오늘 이미 생성된 글 수 확인 (daily cap)
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayCount = await prisma.post.count({
+    where: { category: "commits", createdAt: { gte: todayStart } },
+  });
+
+  if (todayCount >= DAILY_POST_CAP) {
+    console.log(`Daily cap reached (${todayCount}/${DAILY_POST_CAP}). Skipping.`);
+    return { processed: 0, skipped: true };
+  }
+
   let processed = 0;
+  const trivialPatterns = /^(chore|style|docs|fix typo|formatting|lint|bump|merge|revert)/i;
 
   for (const commit of commits) {
-    // typo fix 등 사소한 커밋은 스킵
-    const trivialPatterns = /^(chore|style|docs|fix typo|formatting|lint)/i;
-    if (trivialPatterns.test(commit.message) && commit.message.length < 30) {
+    if (todayCount + processed >= DAILY_POST_CAP) {
+      console.log(`Daily cap reached during processing. Stopping.`);
+      break;
+    }
+
+    // 사소한 커밋 스킵 (30자 조건 제거 — 패턴 매칭만으로 필터링)
+    if (trivialPatterns.test(commit.message)) {
       console.log(`Skipping trivial commit: ${commit.id.slice(0, 7)}`);
       continue;
     }
@@ -106,6 +126,18 @@ export const processCommits = async (
       console.log(`Generated post for commit ${commit.id.slice(0, 7)}`);
     } catch (error) {
       console.error(`Failed to process commit ${commit.id}:`, error);
+    }
+  }
+
+  // 글이 생성되었으면 ISR 캐시 갱신
+  if (processed > 0) {
+    try {
+      revalidatePath("/");
+      revalidatePath("/commits");
+      revalidatePath(`/commits/${repo.toLowerCase()}`);
+      console.log(`Revalidated paths after ${processed} posts created.`);
+    } catch {
+      console.error("Revalidation failed, pages will update within 1 hour.");
     }
   }
 

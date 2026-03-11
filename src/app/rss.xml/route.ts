@@ -1,20 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
 
+export const dynamic = "force-dynamic";
+
 export const GET = async () => {
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-    select: {
-      slug: true,
-      title: true,
-      excerpt: true,
-      category: true,
-      createdAt: true,
-      tags: true,
-    },
-  });
+  let posts: { slug: string; title: string; excerpt: string | null; category: string; createdAt: Date; tags: string[] }[] = [];
+  try {
+    posts = await prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        slug: true,
+        title: true,
+        excerpt: true,
+        category: true,
+        createdAt: true,
+        tags: true,
+      },
+    });
+  } catch {
+    // DB unavailable — return empty feed
+  }
 
   const escapeXml = (s: string) =>
     s

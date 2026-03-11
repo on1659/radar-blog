@@ -5,18 +5,22 @@ import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
 
 const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    select: { slug: true, updatedAt: true },
-    orderBy: { updatedAt: "desc" },
-  });
-
-  const postUrls = posts.map((post) => ({
-    url: `${siteConfig.url}/post/${post.slug}`,
-    lastModified: post.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  let postUrls: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await prisma.post.findMany({
+      where: { published: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    postUrls = posts.map((post) => ({
+      url: `${siteConfig.url}/post/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+  } catch {
+    // DB unavailable during build — skip post URLs
+  }
 
   return [
     {

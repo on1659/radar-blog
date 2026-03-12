@@ -7,7 +7,7 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const prisma = new PrismaClient();
 const ai = new OpenAI({
   apiKey: process.env.Z_AI_API_KEY,
-  baseURL: "https://open.bigmodel.cn/api/paas/v4",
+  baseURL: "https://api.z.ai/api/coding/paas/v4",
 });
 
 const SINCE = "2026-03-01T00:00:00Z";
@@ -107,7 +107,7 @@ async function main() {
 
         // Call z.ai
         const response = await ai.chat.completions.create({
-          model: "glm-4.7-flash",
+          model: "glm-5",
           max_tokens: 2000,
           messages: [
             { role: "system", content: BRIEF_PROMPT },

@@ -3,7 +3,7 @@ import OpenAI from "openai";
 const getClient = () =>
   new OpenAI({
     apiKey: process.env.Z_AI_API_KEY || "dummy",
-    baseURL: "https://open.bigmodel.cn/api/paas/v4",
+    baseURL: "https://api.z.ai/api/coding/paas/v4",
   });
 
 const SYSTEM_PROMPT = `당신은 "이더"라는 개발자의 기술 블로그 글 작성자입니다.
@@ -127,7 +127,7 @@ export const generateBlogContent = async ({
   }
 
   const response = await getClient().chat.completions.create({
-    model: "glm-4.7-flash",
+    model: "glm-5",
     max_tokens: brief ? 2000 : 8000,
     messages: [
       { role: "system", content: systemPrompt },

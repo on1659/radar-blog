@@ -92,7 +92,7 @@ const Home = async ({
     <>
       <HeroBanner dict={dict.hero} />
 
-      <div className="mx-auto flex max-w-container items-center justify-between px-8 pt-12">
+      <div className="mx-auto flex max-w-container items-center justify-between px-5 sm:px-8 pt-12">
         <h2 className="text-[1.375rem] font-bold tracking-[-0.02em]">
           {dict.home.recentPosts}
         </h2>
@@ -108,7 +108,7 @@ const Home = async ({
         <CategoryFilter dict={dict.category} />
       </Suspense>
 
-      <div className="mx-auto flex max-w-container flex-col gap-8 px-8 pb-16 pt-6 lg:flex-row">
+      <div className="mx-auto flex max-w-container flex-col gap-8 px-5 sm:px-8 pb-16 pt-6 lg:flex-row">
         <div className="min-w-0 flex-1">
           <PostList posts={posts} bare />
           {totalPages > 1 && (

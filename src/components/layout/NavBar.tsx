@@ -75,7 +75,7 @@ export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-bg-primary/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-[60px] max-w-container items-center justify-between px-8">
+      <div className="mx-auto flex h-[60px] max-w-container items-center justify-between px-5 sm:px-8">
         <div className="flex items-center gap-8">
           <Link href={`${prefix}/`} className="text-xl font-[800] tracking-[-0.03em] text-text-primary">
             이더<span className="text-brand-primary">.</span>dev
@@ -146,7 +146,7 @@ export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-border px-8 py-4 md:hidden">
+        <div className="border-t border-border px-5 sm:px-8 py-4 md:hidden">
           {navLinks.map((link) => (
             <Link
               key={link.href}

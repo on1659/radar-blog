@@ -31,7 +31,7 @@ export const GiscusComments = () => {
   }, [theme]);
 
   return (
-    <div className="mx-auto max-w-content px-8 pb-20">
+    <div className="mx-auto max-w-content px-5 sm:px-8 pb-20">
       <div ref={ref} />
     </div>
   );

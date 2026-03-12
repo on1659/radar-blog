@@ -93,7 +93,7 @@ export const SearchContent = () => {
   };
 
   return (
-    <div className="mx-auto max-w-container px-8 pb-16 pt-12">
+    <div className="mx-auto max-w-container px-5 sm:px-8 pb-16 pt-12">
       {/* Search Input */}
       <div className="relative mb-6">
         <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />

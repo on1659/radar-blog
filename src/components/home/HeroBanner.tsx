@@ -12,7 +12,7 @@ export const HeroBanner = ({ dict }: { dict: HeroDict }) => {
     : { before: "Code becomes ", highlight: "content." };
 
   return (
-    <section className="relative overflow-hidden bg-[#1B1D1F] px-8 py-20 text-center dark:bg-[#0F1012]">
+    <section className="relative overflow-hidden bg-[#1B1D1F] px-5 sm:px-8 py-20 text-center dark:bg-[#0F1012]">
       <div
         className="pointer-events-none absolute -left-[20%] -top-[50%] h-[200%] w-[140%]"
         style={{

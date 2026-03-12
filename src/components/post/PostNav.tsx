@@ -15,7 +15,7 @@ export const PostNav = ({
   if (!prev && !next) return null;
 
   return (
-    <div className="mx-auto grid max-w-[1000px] grid-cols-2 gap-3 px-8 pb-12">
+    <div className="mx-auto grid max-w-[1000px] grid-cols-2 gap-3 px-5 sm:px-8 pb-12">
       {prev ? (
         <Link
           href={`/post/${prev.slug}`}

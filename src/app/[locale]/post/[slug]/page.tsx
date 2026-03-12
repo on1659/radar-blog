@@ -91,7 +91,7 @@ const PostPage = async ({ params }: PageProps) => {
 
       {/* 시리즈 배너 */}
       {seriesInfo && (
-        <div className="mx-auto max-w-[1000px] px-8 pt-6">
+        <div className="mx-auto max-w-[1000px] px-5 sm:px-8 pt-6">
           <Link
             href={`/series/${seriesInfo.slug}`}
             className="block rounded-xl border border-border bg-bg-secondary px-5 py-3 transition-all duration-base hover:border-brand-primary"
@@ -114,7 +114,7 @@ const PostPage = async ({ params }: PageProps) => {
         readingTime={post.readingTime}
       />
 
-      <div className="mx-auto flex max-w-[1000px] gap-12 px-8">
+      <div className="mx-auto flex max-w-[1000px] gap-12 px-5 sm:px-8">
         <article className="prose prose-lg max-w-content flex-1 pb-20 pt-10 dark:prose-invert">
           {content}
 

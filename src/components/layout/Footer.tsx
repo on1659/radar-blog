@@ -8,7 +8,7 @@ interface FooterDict {
 
 export const Footer = ({ dict }: { dict: FooterDict }) => {
   return (
-    <footer className="border-t border-border py-10 px-8">
+    <footer className="border-t border-border py-10 px-5 sm:px-8">
       <div className="mx-auto flex max-w-container flex-col justify-between gap-8 sm:flex-row sm:items-start">
         <div>
           <div className="mb-2 text-base font-[800]">

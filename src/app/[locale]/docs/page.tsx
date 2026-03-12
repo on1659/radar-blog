@@ -44,7 +44,7 @@ const MethodBadge = ({ method }: { method: string }) => {
 const DocsPage = () => (
   <>
     {/* Hero */}
-    <section className="bg-[#1B1D1F] px-8 py-16 dark:bg-[#0F1012]">
+    <section className="bg-[#1B1D1F] px-5 sm:px-8 py-16 dark:bg-[#0F1012]">
       <div className="mx-auto max-w-content">
         <div className="mb-4 flex items-center gap-2 text-white/50">
           <Book size={16} />
@@ -60,7 +60,7 @@ const DocsPage = () => (
       </div>
     </section>
 
-    <div className="mx-auto max-w-content px-8 pb-20 pt-10">
+    <div className="mx-auto max-w-content px-5 sm:px-8 pb-20 pt-10">
       {/* Base URL */}
       <div className="mb-10 rounded-lg border border-border bg-bg-secondary/50 p-5">
         <div className="mb-2 flex items-center gap-2 text-meta font-semibold text-text-tertiary uppercase">

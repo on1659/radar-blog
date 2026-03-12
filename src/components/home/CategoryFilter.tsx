@@ -34,7 +34,7 @@ export const CategoryFilter = ({ dict }: { dict: CategoryDict }) => {
   };
 
   return (
-    <div className="mx-auto flex max-w-container flex-wrap gap-2 px-8 pt-5">
+    <div className="mx-auto flex max-w-container flex-wrap gap-2 px-5 sm:px-8 pt-5">
       {siteConfig.categories.map((cat) => (
         <button
           key={cat.key}

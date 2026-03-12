@@ -63,7 +63,7 @@ const CommitsPage = async ({
 
   return (
     <div>
-      <div className="mx-auto max-w-container px-8 pt-12">
+      <div className="mx-auto max-w-container px-5 sm:px-8 pt-12">
         <h1 className="text-section-title">Commits</h1>
         <p className="mt-2 text-card-desc text-text-secondary">
           GitHub 커밋 기반으로 자동 생성된 개발 기록
@@ -98,7 +98,7 @@ const CommitsPage = async ({
       </div>
       <PostList posts={mapped} />
       {totalPages > 1 && (
-        <div className="mx-auto max-w-container px-8 pb-16">
+        <div className="mx-auto max-w-container px-5 sm:px-8 pb-16">
           <Pagination
             currentPage={page}
             totalPages={totalPages}

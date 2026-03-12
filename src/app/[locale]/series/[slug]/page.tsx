@@ -54,7 +54,7 @@ const SeriesDetailPage = async ({ params }: PageProps) => {
 
   return (
     <div>
-      <div className="mx-auto max-w-container px-8 pt-12">
+      <div className="mx-auto max-w-container px-5 sm:px-8 pt-12">
         <h1 className="text-section-title">{series.title}</h1>
         {series.description && (
           <p className="mt-2 text-card-desc text-text-secondary">

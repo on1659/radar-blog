@@ -57,7 +57,7 @@ const ProjectCommitsPage = async ({ params, searchParams }: PageProps) => {
 
   return (
     <div>
-      <div className="mx-auto max-w-container px-8 pt-12">
+      <div className="mx-auto max-w-container px-5 sm:px-8 pt-12">
         <div className="flex items-center gap-3">
           <Link
             href="/commits"
@@ -73,7 +73,7 @@ const ProjectCommitsPage = async ({ params, searchParams }: PageProps) => {
       </div>
       <PostList posts={mapped} />
       {totalPages > 1 && (
-        <div className="mx-auto max-w-container px-8 pb-16">
+        <div className="mx-auto max-w-container px-5 sm:px-8 pb-16">
           <Pagination currentPage={page} totalPages={totalPages} />
         </div>
       )}

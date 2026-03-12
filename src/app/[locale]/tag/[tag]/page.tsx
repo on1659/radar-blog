@@ -42,7 +42,7 @@ const TagPage = async ({ params }: PageProps) => {
 
   return (
     <div>
-      <div className="mx-auto max-w-container px-8 pt-12">
+      <div className="mx-auto max-w-container px-5 sm:px-8 pt-12">
         <h1 className="text-section-title">#{decoded}</h1>
         <p className="mt-2 text-card-desc text-text-secondary">
           {mapped.length}개의 게시물

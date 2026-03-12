@@ -32,7 +32,7 @@ const TechLabPage = async () => {
 
   return (
     <div>
-      <div className="mx-auto max-w-container px-8 pt-12">
+      <div className="mx-auto max-w-container px-5 sm:px-8 pt-12">
         <h1 className="text-section-title">Tech Lab</h1>
         <p className="mt-2 text-card-desc text-text-secondary">
           실험적인 기술 연구와 벤치마크

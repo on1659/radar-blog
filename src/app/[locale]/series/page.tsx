@@ -13,7 +13,7 @@ const SeriesPage = async () => {
   }).catch(() => []);
 
   return (
-    <div className="mx-auto max-w-container px-8 py-12">
+    <div className="mx-auto max-w-container px-5 sm:px-8 py-12">
       <h1 className="mb-6 text-section-title">시리즈</h1>
 
       {seriesList.length === 0 ? (

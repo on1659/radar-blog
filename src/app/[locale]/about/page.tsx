@@ -53,7 +53,7 @@ const AboutPage = async ({
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-[#1B1D1F] px-8 py-[72px] text-center dark:bg-[#0F1012]">
+      <section className="bg-[#1B1D1F] px-5 sm:px-8 py-[72px] text-center dark:bg-[#0F1012]">
         <div className="mx-auto mb-5 flex h-[100px] w-[100px] items-center justify-center rounded-full bg-gradient-to-br from-[#3182F6] to-[#8B5CF6] text-4xl font-[800] text-white">
           E
         </div>
@@ -86,7 +86,7 @@ const AboutPage = async ({
       </section>
 
       {/* Body */}
-      <div className="mx-auto max-w-content px-8 pb-20 pt-12">
+      <div className="mx-auto max-w-content px-5 sm:px-8 pb-20 pt-12">
         {/* 소개 */}
         <h2 className="mb-4 text-sub-heading tracking-[-0.01em]">소개</h2>
         <div className="mb-12 space-y-4 text-body text-text-secondary">

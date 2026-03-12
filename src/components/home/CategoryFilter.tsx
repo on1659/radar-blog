@@ -11,11 +11,18 @@ interface CategoryDict {
   casual: string;
 }
 
-export const CategoryFilter = ({ dict }: { dict: CategoryDict }) => {
+export const CategoryFilter = ({
+  dict,
+  commitProjects = [],
+}: {
+  dict: CategoryDict;
+  commitProjects?: string[];
+}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const current = searchParams.get("category") || "all";
+  const currentProject = searchParams.get("project") || null;
 
   const labels: Record<string, string> = {
     all: dict.all,
@@ -33,8 +40,16 @@ export const CategoryFilter = ({ dict }: { dict: CategoryDict }) => {
     }
   };
 
+  const handleProject = (proj: string | null) => {
+    if (proj) {
+      router.push(`${pathname}?category=commits&project=${proj}`, { scroll: false });
+    } else {
+      router.push(`${pathname}?category=commits`, { scroll: false });
+    }
+  };
+
   return (
-    <div className="mx-auto flex max-w-container flex-wrap gap-2 px-5 sm:px-8 pt-5">
+    <div className="mx-auto flex max-w-container flex-wrap items-center gap-2 px-5 sm:px-8 pt-5">
       {siteConfig.categories.map((cat) => (
         <button
           key={cat.key}
@@ -48,6 +63,35 @@ export const CategoryFilter = ({ dict }: { dict: CategoryDict }) => {
           {labels[cat.key] || cat.label}
         </button>
       ))}
+
+      {current === "commits" && commitProjects.length > 0 && (
+        <>
+          <span className="mx-1 h-5 w-px bg-border" />
+          <button
+            onClick={() => handleProject(null)}
+            className={`rounded-full border px-3 py-1 text-[0.6875rem] font-medium transition-all duration-base ${
+              !currentProject
+                ? "border-cat-commits bg-cat-commits text-white"
+                : "border-border text-text-tertiary hover:border-cat-commits hover:text-cat-commits"
+            }`}
+          >
+            전체
+          </button>
+          {commitProjects.map((proj) => (
+            <button
+              key={proj}
+              onClick={() => handleProject(proj)}
+              className={`rounded-full border px-3 py-1 text-[0.6875rem] font-medium transition-all duration-base ${
+                currentProject === proj
+                  ? "border-cat-commits bg-cat-commits text-white"
+                  : "border-border text-text-tertiary hover:border-cat-commits hover:text-cat-commits"
+              }`}
+            >
+              {proj}
+            </button>
+          ))}
+        </>
+      )}
     </div>
   );
 };

@@ -15,11 +15,14 @@ import type { Locale } from "@/i18n/config";
 
 const PAGE_SIZE = 10;
 
-const getPosts = async (category?: string, page = 1) => {
+const getPosts = async (category?: string, project?: string, page = 1) => {
   try {
     const where: Record<string, unknown> = { published: true };
     if (category && category !== "all") {
       where.category = category as Category;
+      if (category === "commits" && project) {
+        where.repoName = project;
+      }
     } else {
       // "전체"에서는 commits 제외
       where.category = { not: "commits" };
@@ -72,19 +75,34 @@ const getPosts = async (category?: string, page = 1) => {
   }
 };
 
+const getCommitProjects = async (): Promise<string[]> => {
+  try {
+    const raw = await prisma.post.findMany({
+      where: { published: true, category: "commits", repoName: { not: null } },
+      distinct: ["repoName"],
+      select: { repoName: true },
+      orderBy: { repoName: "asc" },
+    });
+    return raw.map((p) => p.repoName).filter(Boolean) as string[];
+  } catch {
+    return [];
+  }
+};
+
 const Home = async ({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ category?: string; page?: string }>;
+  searchParams: Promise<{ category?: string; project?: string; page?: string }>;
 }) => {
   const { locale: rawLocale } = await params;
   const locale: Locale = isValidLocale(rawLocale) ? rawLocale : i18n.defaultLocale;
   const dict = await getDictionary(locale);
   const sp = await searchParams;
   const page = Math.max(1, Number(sp.page) || 1);
-  const { posts, totalPages } = await getPosts(sp.category, page);
+  const { posts, totalPages } = await getPosts(sp.category, sp.project, page);
+  const commitProjects = sp.category === "commits" ? await getCommitProjects() : [];
 
   const prefix = locale === "ko" ? "" : `/${locale}`;
 
@@ -105,14 +123,19 @@ const Home = async ({
       </div>
 
       <Suspense>
-        <CategoryFilter dict={dict.category} />
+        <CategoryFilter dict={dict.category} commitProjects={commitProjects} />
       </Suspense>
 
       <div className="mx-auto flex max-w-container flex-col gap-8 px-5 sm:px-8 pb-16 pt-6 lg:flex-row">
         <div className="min-w-0 flex-1">
           <PostList posts={posts} bare />
           {totalPages > 1 && (
-            <Pagination currentPage={page} totalPages={totalPages} category={sp.category} />
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              category={sp.category}
+              extraParams={sp.project ? { project: sp.project } : undefined}
+            />
           )}
         </div>
         <RecentPostsSidebar posts={posts} title={dict.home.recentSidebar} />

@@ -23,7 +23,6 @@ interface EnvItem {
   label: string;
   group: string;
   set: boolean;
-  preview: string | null;
 }
 
 interface AiProvider {
@@ -56,6 +55,10 @@ const AI_MODELS: Record<string, { label: string; value: string }[]> = {
   xai: [
     { label: "Grok 3", value: "grok-3" },
     { label: "Grok 3 Mini", value: "grok-3-mini" },
+  ],
+  zai: [
+    { label: "GLM-4", value: "glm-4" },
+    { label: "GLM-4 Plus", value: "glm-4-plus" },
   ],
 };
 
@@ -292,7 +295,6 @@ const AdminSettingsPage = () => {
     core: "핵심",
     ai: "AI",
     github: "GitHub",
-    admin: "관리자",
     analytics: "통계",
   };
 
@@ -335,8 +337,8 @@ const AdminSettingsPage = () => {
                       <span className="text-card-desc">{item.label}</span>
                       <code className="text-[0.7rem] text-text-muted">{item.key}</code>
                     </div>
-                    <span className="font-code text-meta text-text-muted">
-                      {item.set ? item.preview : "미설정"}
+                    <span className={`text-meta font-medium ${item.set ? "text-cat-commits" : "text-cat-casual"}`}>
+                      {item.set ? "설정됨" : "미설정"}
                     </span>
                   </div>
                 ))}

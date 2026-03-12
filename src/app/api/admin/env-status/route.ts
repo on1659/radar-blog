@@ -16,13 +16,11 @@ const ENV_KEYS = [
   { key: "OPENAI_API_KEY", label: "OpenAI API Key (GPT)", group: "ai" },
   { key: "GOOGLE_AI_API_KEY", label: "Google AI API Key (Gemini)", group: "ai" },
   { key: "XAI_API_KEY", label: "xAI API Key (Grok)", group: "ai" },
+  { key: "Z_AI_API_KEY", label: "z.ai API Key (GLM-4)", group: "ai" },
   { key: "GITHUB_TOKEN", label: "GitHub Token", group: "github" },
   { key: "GITHUB_WEBHOOK_SECRET", label: "GitHub Webhook Secret", group: "github" },
   { key: "GITHUB_CLIENT_ID", label: "GitHub OAuth Client ID", group: "github" },
   { key: "GITHUB_CLIENT_SECRET", label: "GitHub OAuth Client Secret", group: "github" },
-  { key: "ADMIN_ID", label: "Admin ID", group: "admin" },
-  { key: "ADMIN_PASSWORD", label: "Admin Password", group: "admin" },
-  { key: "ADMIN_GITHUB_ID", label: "Admin GitHub ID", group: "admin" },
   { key: "NEXT_PUBLIC_UMAMI_URL", label: "Umami URL", group: "analytics" },
   { key: "NEXT_PUBLIC_UMAMI_WEBSITE_ID", label: "Umami Website ID", group: "analytics" },
 ] as const;
@@ -33,6 +31,7 @@ const AI_PROVIDERS = [
   { id: "openai", label: "GPT (OpenAI)", envKey: "OPENAI_API_KEY" },
   { id: "google", label: "Gemini (Google)", envKey: "GOOGLE_AI_API_KEY" },
   { id: "xai", label: "Grok (xAI)", envKey: "XAI_API_KEY" },
+  { id: "zai", label: "GLM-4 (z.ai)", envKey: "Z_AI_API_KEY" },
 ] as const;
 
 export const GET = async () => {
@@ -45,9 +44,6 @@ export const GET = async () => {
     label,
     group,
     set: !!process.env[key],
-    preview: process.env[key]
-      ? `${process.env[key]!.slice(0, 4)}${"*".repeat(Math.min(process.env[key]!.length - 4, 12))}`
-      : null,
   }));
 
   const aiProviders = AI_PROVIDERS.map(({ id, label, envKey }) => ({

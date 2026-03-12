@@ -78,7 +78,7 @@ export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
       <div className="mx-auto flex h-[60px] max-w-container items-center justify-between px-8">
         <div className="flex items-center gap-8">
           <Link href={`${prefix}/`} className="text-xl font-[800] tracking-[-0.03em] text-text-primary">
-            이더<span className="text-brand-primary">.</span>dev
+            레이더<span className="text-brand-primary">.</span>dev
           </Link>
           <div className="hidden items-center gap-2 md:flex">
             {navLinks.map((link) => (

@@ -7,7 +7,7 @@ import Fuse from "fuse.js";
 import { PostItem } from "@/components/post/PostItem";
 import type { PostMeta } from "@/types";
 
-const RECENT_KEY = "ether-recent-searches";
+const RECENT_KEY = "radar-recent-searches";
 const MAX_RECENT = 5;
 
 const getRecentSearches = (): string[] => {

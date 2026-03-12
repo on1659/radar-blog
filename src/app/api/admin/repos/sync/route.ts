@@ -25,7 +25,7 @@ export const POST = async () => {
   });
 
   const activeRepos = allRepos.filter(
-    (r) => new Date(r.pushed_at ?? 0) > cutoff && r.name !== "ether-blog"
+    (r) => new Date(r.pushed_at ?? 0) > cutoff && r.name !== "radar-blog"
   );
 
   // DB에 이미 등록된 레포 목록
@@ -83,7 +83,7 @@ export const GET = async (req: Request) => {
   });
 
   const activeRepos = allRepos.filter(
-    (r) => new Date(r.pushed_at ?? 0) > cutoff && r.name !== "ether-blog"
+    (r) => new Date(r.pushed_at ?? 0) > cutoff && r.name !== "radar-blog"
   );
 
   const existing = await prisma.watchedRepo.findMany({

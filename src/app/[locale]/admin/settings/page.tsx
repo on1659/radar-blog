@@ -353,10 +353,10 @@ const AdminSettingsPage = () => {
       <Section title="사이트 설정" icon={Shield}>
         <div className="space-y-4">
           {[
-            { key: "site_title", label: "블로그 제목", placeholder: "이더.dev" },
+            { key: "site_title", label: "블로그 제목", placeholder: "레이더.dev" },
             { key: "site_description", label: "블로그 설명", placeholder: "코드를 쓰면, 글이 된다." },
             { key: "site_url", label: "사이트 URL", placeholder: "https://..." },
-            { key: "author_name", label: "저자 이름", placeholder: "이더" },
+            { key: "author_name", label: "저자 이름", placeholder: "레이더" },
             { key: "author_role", label: "저자 직함", placeholder: "UE5 C++ 게임 프로그래머" },
             { key: "author_email", label: "이메일", placeholder: "user@example.com" },
             { key: "author_github", label: "GitHub URL", placeholder: "https://github.com/..." },

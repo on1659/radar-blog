@@ -1,12 +1,12 @@
-# 이더 블로그 — Claude Code 빌드 프롬프트
+# 레이더 블로그 — Claude Code 빌드 프롬프트
 
 > **사용법:**
 > 1. 프로젝트 폴더를 만들고 CLAUDE.md를 루트에 복사
-> 2. BLOG_REQUIREMENTS.md, DESIGN_SYSTEM.md, ether-blog-mockup-v2.html도 루트에 복사
+> 2. BLOG_REQUIREMENTS.md, DESIGN_SYSTEM.md, radar-blog-mockup-v2.html도 루트에 복사
 > 3. Claude Code를 열고 아래 프롬프트를 **순서대로 하나씩** 입력
 > 4. 각 단계가 완료되면 확인 후 다음 단계로
 
-## 모델 선택 가이드 (이더 참고용 — Claude Code에서 `/model`로 직접 전환)
+## 모델 선택 가이드 (레이더 참고용 — Claude Code에서 `/model`로 직접 전환)
 
 | 단계 | 모델 | 이유 |
 |------|------|------|
@@ -28,8 +28,8 @@
 ## 시작 전 준비
 
 ```bash
-mkdir ether-blog && cd ether-blog
-# CLAUDE.md, BLOG_REQUIREMENTS.md, DESIGN_SYSTEM.md, ether-blog-mockup-v2.html을 여기에 복사
+mkdir radar-blog && cd radar-blog
+# CLAUDE.md, BLOG_REQUIREMENTS.md, DESIGN_SYSTEM.md, radar-blog-mockup-v2.html을 여기에 복사
 ```
 
 ---
@@ -91,11 +91,11 @@ NextAuth.js (Auth.js v5) 설정해줘.
 ### Step 1-4: 레이아웃 + 네비게이션 + 푸터
 
 ```
-전역 레이아웃을 만들어줘. ether-blog-mockup-v2.html을 참고해서 정확한 디자인으로.
+전역 레이아웃을 만들어줘. radar-blog-mockup-v2.html을 참고해서 정확한 디자인으로.
 
 1. app/layout.tsx — ThemeProvider(next-themes) + NavBar + Footer + 메타데이터
 2. components/layout/NavBar.tsx:
-   - "이더.dev" 로고 (점에 accent 색)
+   - "레이더.dev" 로고 (점에 accent 색)
    - Blog, Projects, About 링크
    - 검색 아이콘 버튼, 다크모드 토글
    - 모바일: 햄버거 메뉴
@@ -196,7 +196,7 @@ commits 페이지는 프로젝트별 그룹핑이 핵심:
 app/about/page.tsx:
 1. 다크 히어로 섹션:
    - 아바타 (그라데이션 원 + "E")
-   - "이더" + "UE5 C++ 게임 프로그래머" + "AI × 사이드프로젝트 빌더"
+   - "레이더" + "UE5 C++ 게임 프로그래머" + "AI × 사이드프로젝트 빌더"
    - GitHub, Email, RSS 버튼 (아웃라인 스타일, 다크 배경 위)
 2. 본문 섹션 (max-width: 720px):
    - "소개" — 자기소개 텍스트 (목업 내용 그대로)
@@ -519,7 +519,7 @@ Railway 배포 설정을 만들어줘.
 1. **한 번에 하나씩.** Step 하나가 끝나면 `npm run dev`로 확인 후 다음 Step.
 2. **커밋 자주.** 각 Step 완료 시 커밋. 문제 생기면 되돌릴 수 있게.
 3. **에러나면 바로 물어봐.** 에러 메시지 전체를 복붙하면 Claude Code가 잘 잡아줌.
-4. **디자인 확인은 목업과 비교.** `ether-blog-mockup-v2.html`을 브라우저에서 열어두고 비교.
+4. **디자인 확인은 목업과 비교.** `radar-blog-mockup-v2.html`을 브라우저에서 열어두고 비교.
 5. **DB 마이그레이션.** Prisma 스키마 수정 후 `npx prisma migrate dev --name 설명` 잊지 마.
 6. **seed 데이터.** Step 1-5 이후 테스트용 더미 글 데이터를 넣어두면 편함:
    ```

@@ -1,14 +1,14 @@
 export const siteConfig = {
-  title: "이더.dev",
+  title: "레이더.dev",
   description: "코드를 쓰면, 글이 된다. GitHub 커밋 기반 AI 자동 기술 블로그.",
   url: "https://radar-blog.up.railway.app",
   author: {
-    name: "이더",
-    nameEn: "Ether",
+    name: "레이더",
+    nameEn: "Radar",
     role: "UE5 C++ 게임 프로그래머",
     sub: "AI × 사이드프로젝트 빌더",
-    github: "https://github.com/your-username",
-    email: "your@email.com",
+    github: "https://github.com/on1659",
+    email: "on1659@naver.com",
     bio: [
       "본업은 UE5 C++ 게임 프로그래머다. 멀티플레이어 시스템, Slate UI, iOS/Android 크로스플랫폼 개발을 하고 있다.",
       "퇴근 후에는 AI로 실제 작동하는 프로덕트를 만든다. \"AI를 공부한다\"가 아니라 \"AI로 뭔가를 만들어서 돌린다\"에 가깝다. 이 블로그는 그 과정에서 생기는 삽질, 코드, 깨달음을 기록하는 곳이다.",

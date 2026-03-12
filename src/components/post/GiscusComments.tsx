@@ -12,7 +12,7 @@ export const GiscusComments = () => {
 
     const script = document.createElement("script");
     script.src = "https://giscus.app/client.js";
-    script.setAttribute("data-repo", "your-username/ether-blog");
+    script.setAttribute("data-repo", "your-username/radar-blog");
     script.setAttribute("data-repo-id", "");
     script.setAttribute("data-category", "Comments");
     script.setAttribute("data-category-id", "");

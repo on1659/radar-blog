@@ -38,11 +38,11 @@ export const PostDetailHeader = ({
       )}
       <div className="flex items-center gap-3 border-b border-border pb-8 text-sm text-text-tertiary">
         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#3182F6] to-[#8B5CF6] text-xs font-bold text-white">
-          E
+          R
         </div>
         <div className="leading-[1.4]">
           <div className="text-[0.9375rem] font-semibold text-text-primary">
-            이더
+            레이더
           </div>
           <div>
             {dateStr} · {readingTime} min read

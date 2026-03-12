@@ -1,8 +1,8 @@
-# CLAUDE.md — 이더 테크블로그
+# CLAUDE.md — 레이더 테크블로그
 
 ## 프로젝트 개요
 
-"이더" 테크블로그. GitHub 커밋을 감지하여 AI가 자동으로 블로그 글을 생성·발행하는 개인 개발 블로그.
+"레이더" 테크블로그. GitHub 커밋을 감지하여 AI가 자동으로 블로그 글을 생성·발행하는 개인 개발 블로그.
 레퍼런스 디자인: tech.kakao.com (카카오테크)
 
 ## 기술 스택
@@ -25,8 +25,8 @@
 ## 디렉토리 구조
 
 ```
-ether-blog/
-├── prisma/
+radar-blog/
+├── prisma/c
 │   └── schema.prisma
 ├── public/
 │   └── fonts/
@@ -115,7 +115,7 @@ ether-blog/
 ### 레퍼런스: tech.kakao.com (카카오테크)
 
 **레이아웃:**
-- 미니멀 네비게이션: "이더.dev" 로고 + Blog/Projects/About + 검색/다크모드
+- 미니멀 네비게이션: "레이더.dev" 로고 + Blog/Projects/About + 검색/다크모드
 - 다크 히어로 배너 (메인 상단)
 - 수평 카드 리스트 (왼쪽 썸네일 200×130 + 오른쪽 텍스트)
 - 카드 구분: box-shadow가 아닌 border-bottom 구분선
@@ -207,5 +207,5 @@ chore: 설정/빌드
 
 - 요구사항: BLOG_REQUIREMENTS.md
 - 디자인 시스템: DESIGN_SYSTEM.md
-- 목업: ether-blog-mockup-v2.html
+- 목업: radar-blog-mockup-v2.html
 - AI 글 생성 규칙: BLOG_REQUIREMENTS.md 부록 (시스템 프롬프트에 포함할 문체/구조 규칙)

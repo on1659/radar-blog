@@ -1,4 +1,4 @@
-이 폴더에 CLAUDE.md, BLOG_REQUIREMENTS.md, DESIGN_SYSTEM.md, PROMPTS.md, ether-blog-mockup-v2.html이 있어.
+이 폴더에 CLAUDE.md, BLOG_REQUIREMENTS.md, DESIGN_SYSTEM.md, PROMPTS.md, radar-blog-mockup-v2.html이 있어.
 
 먼저 CLAUDE.md를 읽고 프로젝트 전체 맥락을 파악해줘.
 

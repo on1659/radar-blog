@@ -36,7 +36,7 @@
     "prevPost": "← Previous",
     "nextPost": "Next →",
     "toc": "On this page",
-    "author": "Ether"
+    "author": "Radar"
   },
   "search": {
     "placeholder": "Search posts...",
@@ -59,7 +59,7 @@
   "footer": {
     "links": "Links",
     "categories": "Categories",
-    "copyright": "© 2026 Ether. Powered by Next.js + Railway"
+    "copyright": "© 2026 Radar. Powered by Next.js + Railway"
   },
   "common": {
     "readMore": "Read More",

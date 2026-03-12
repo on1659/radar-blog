@@ -51,7 +51,7 @@ const DocsPage = () => (
           <span className="text-meta font-medium tracking-wide uppercase">API Reference</span>
         </div>
         <h1 className="mb-3 text-[2rem] font-[800] leading-tight text-white">
-          이더.dev REST API
+          레이더.dev REST API
         </h1>
         <p className="max-w-[520px] text-[0.9375rem] leading-relaxed text-white/60">
           외부에서 블로그 글을 발행하고 조회할 수 있는 REST API.

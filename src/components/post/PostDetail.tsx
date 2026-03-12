@@ -42,7 +42,7 @@ export const PostDetailHeader = ({
         </div>
         <div className="leading-[1.4]">
           <div className="text-[0.9375rem] font-semibold text-text-primary">
-            레이더
+            이더
           </div>
           <div>
             {dateStr} · {readingTime} min read

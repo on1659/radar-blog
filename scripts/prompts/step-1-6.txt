@@ -1,4 +1,4 @@
-글 상세 페이지를 만들어줘. docs/ether-blog-mockup-v2.html 목업의 글 상세와 동일하게.
+글 상세 페이지를 만들어줘. docs/radar-blog-mockup-v2.html 목업의 글 상세와 동일하게.
 
 1. app/post/[slug]/page.tsx:
    - Prisma에서 slug로 글 조회

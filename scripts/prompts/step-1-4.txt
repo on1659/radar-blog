@@ -1,4 +1,4 @@
-전역 레이아웃을 만들어줘. ether-blog-mockup-v2.html을 참고해서 정확한 디자인으로.
+전역 레이아웃을 만들어줘. radar-blog-mockup-v2.html을 참고해서 정확한 디자인으로.
 
 1. app/layout.tsx — ThemeProvider(next-themes) + NavBar + Footer + 메타데이터
 2. components/layout/NavBar.tsx:

@@ -1,4 +1,4 @@
-소개 페이지를 만들어줘. docs/ether-blog-mockup-v2.html 목업의 About 페이지와 동일하게.
+소개 페이지를 만들어줘. docs/radar-blog-mockup-v2.html 목업의 About 페이지와 동일하게.
 
 app/about/page.tsx:
 1. 다크 히어로 섹션:

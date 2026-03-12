@@ -1,4 +1,4 @@
-메인 페이지를 만들어줘. docs/ether-blog-mockup-v2.html 목업의 메인 페이지와 동일하게.
+메인 페이지를 만들어줘. docs/radar-blog-mockup-v2.html 목업의 메인 페이지와 동일하게.
 
 1. app/page.tsx — Server Component
 2. components/home/HeroBanner.tsx:

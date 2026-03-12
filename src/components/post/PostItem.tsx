@@ -45,7 +45,7 @@ export const PostItem = ({ post }: { post: PostMeta }) => {
           {post.excerpt}
         </p>
         <div className="flex items-center gap-2 text-meta text-text-tertiary">
-          <span>레이더</span>
+          <span>이더</span>
           <span className="h-0.5 w-0.5 flex-shrink-0 rounded-full bg-text-muted" />
           <span>{new Date(post.createdAt).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "")}</span>
           <span className="h-0.5 w-0.5 flex-shrink-0 rounded-full bg-text-muted" />

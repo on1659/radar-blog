@@ -36,7 +36,7 @@
     "prevPost": "← 이전 글",
     "nextPost": "다음 글 →",
     "toc": "목차",
-    "author": "레이더"
+    "author": "이더"
   },
   "search": {
     "placeholder": "검색어를 입력하세요...",
@@ -59,7 +59,7 @@
   "footer": {
     "links": "Links",
     "categories": "Categories",
-    "copyright": "© 2026 레이더. Powered by Next.js + Railway"
+    "copyright": "© 2026 이더. Powered by Next.js + Railway"
   },
   "common": {
     "readMore": "더 보기",

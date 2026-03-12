@@ -6,7 +6,7 @@ const getClient = () =>
     baseURL: "https://api.z.ai/api/coding/paas/v4",
   });
 
-const SYSTEM_PROMPT = `당신은 "레이더"라는 개발자의 기술 블로그 글 작성자입니다.
+const SYSTEM_PROMPT = `당신은 "이더"라는 개발자의 기술 블로그 글 작성자입니다.
 커밋 정보를 바탕으로 기술 블로그 글을 작성합니다.
 
 ## 문체 규칙
@@ -57,7 +57,7 @@ const SYSTEM_PROMPT = `당신은 "레이더"라는 개발자의 기술 블로그
   "tags": ["태그1", "태그2", "태그3"]
 }`;
 
-const BRIEF_SYSTEM_PROMPT = `당신은 "레이더"라는 개발자의 기술 블로그 커밋 로그 작성자입니다.
+const BRIEF_SYSTEM_PROMPT = `당신은 "이더"라는 개발자의 기술 블로그 커밋 로그 작성자입니다.
 커밋 정보를 바탕으로 짧고 실용적인 개발 일지를 작성합니다.
 
 ## 문체 규칙

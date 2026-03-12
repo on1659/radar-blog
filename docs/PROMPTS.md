@@ -1,4 +1,4 @@
-# 레이더 블로그 — Claude Code 빌드 프롬프트
+# 이더 블로그 — Claude Code 빌드 프롬프트
 
 > **사용법:**
 > 1. 프로젝트 폴더를 만들고 CLAUDE.md를 루트에 복사
@@ -6,7 +6,7 @@
 > 3. Claude Code를 열고 아래 프롬프트를 **순서대로 하나씩** 입력
 > 4. 각 단계가 완료되면 확인 후 다음 단계로
 
-## 모델 선택 가이드 (레이더 참고용 — Claude Code에서 `/model`로 직접 전환)
+## 모델 선택 가이드 (이더 참고용 — Claude Code에서 `/model`로 직접 전환)
 
 | 단계 | 모델 | 이유 |
 |------|------|------|
@@ -95,7 +95,7 @@ NextAuth.js (Auth.js v5) 설정해줘.
 
 1. app/layout.tsx — ThemeProvider(next-themes) + NavBar + Footer + 메타데이터
 2. components/layout/NavBar.tsx:
-   - "레이더.dev" 로고 (점에 accent 색)
+   - "이더.dev" 로고 (점에 accent 색)
    - Blog, Projects, About 링크
    - 검색 아이콘 버튼, 다크모드 토글
    - 모바일: 햄버거 메뉴
@@ -196,7 +196,7 @@ commits 페이지는 프로젝트별 그룹핑이 핵심:
 app/about/page.tsx:
 1. 다크 히어로 섹션:
    - 아바타 (그라데이션 원 + "E")
-   - "레이더" + "UE5 C++ 게임 프로그래머" + "AI × 사이드프로젝트 빌더"
+   - "이더" + "UE5 C++ 게임 프로그래머" + "AI × 사이드프로젝트 빌더"
    - GitHub, Email, RSS 버튼 (아웃라인 스타일, 다크 배경 위)
 2. 본문 섹션 (max-width: 720px):
    - "소개" — 자기소개 텍스트 (목업 내용 그대로)

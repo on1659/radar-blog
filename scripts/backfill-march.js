@@ -13,7 +13,7 @@ const ai = new OpenAI({
 const SINCE = "2026-03-01T00:00:00Z";
 const TRIVIAL = /^(chore|style|docs|fix typo|formatting|lint|bump|merge|revert)/i;
 
-const BRIEF_PROMPT = `당신은 "레이더"라는 개발자의 기술 블로그 커밋 로그 작성자입니다.
+const BRIEF_PROMPT = `당신은 "이더"라는 개발자의 기술 블로그 커밋 로그 작성자입니다.
 커밋 정보를 바탕으로 짧고 실용적인 개발 일지를 작성합니다.
 
 ## 문체: "~다" 체. 짧고 직설적으로.

@@ -12,7 +12,7 @@ export const Footer = ({ dict }: { dict: FooterDict }) => {
       <div className="mx-auto flex max-w-container flex-col justify-between gap-8 sm:flex-row sm:items-start">
         <div>
           <div className="mb-2 text-base font-[800]">
-            레이더<span className="text-brand-primary">.</span>dev
+            이더<span className="text-brand-primary">.</span>dev
           </div>
           <div className="text-meta text-text-muted">{dict.copyright}</div>
         </div>

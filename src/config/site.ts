@@ -1,9 +1,9 @@
 export const siteConfig = {
-  title: "레이더.dev",
+  title: "이더.dev",
   description: "코드를 쓰면, 글이 된다. GitHub 커밋 기반 AI 자동 기술 블로그.",
   url: "https://radar-blog.up.railway.app",
   author: {
-    name: "레이더",
+    name: "이더",
     nameEn: "Radar",
     role: "UE5 C++ 게임 프로그래머",
     sub: "AI × 사이드프로젝트 빌더",

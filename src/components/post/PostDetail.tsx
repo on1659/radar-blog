@@ -26,7 +26,7 @@ export const PostDetailHeader = ({
     .replace(/\.$/, "");
 
   return (
-    <header className="mx-auto max-w-content px-8 pt-14">
+    <header className="mx-auto max-w-[1000px] px-8 pt-14">
       <div className="mb-5 flex gap-2">
         <Badge category={category} />
       </div>

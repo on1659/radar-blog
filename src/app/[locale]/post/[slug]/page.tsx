@@ -91,7 +91,7 @@ const PostPage = async ({ params }: PageProps) => {
 
       {/* 시리즈 배너 */}
       {seriesInfo && (
-        <div className="mx-auto max-w-content px-8 pt-6">
+        <div className="mx-auto max-w-[1000px] px-8 pt-6">
           <Link
             href={`/series/${seriesInfo.slug}`}
             className="block rounded-xl border border-border bg-bg-secondary px-5 py-3 transition-all duration-base hover:border-brand-primary"

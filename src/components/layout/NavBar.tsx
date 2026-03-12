@@ -35,9 +35,11 @@ export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
 
   const isActive = (href: string) => {
     const clean = href.replace(/#.*$/, "");
+    const hasHash = href.includes("#");
     if (clean === `${prefix}/` || clean === "/") {
       return pathname === "/" || pathname === `/${locale}` || pathname === `${prefix}/`;
     }
+    if (hasHash) return false;
     return pathname.startsWith(clean);
   };
 

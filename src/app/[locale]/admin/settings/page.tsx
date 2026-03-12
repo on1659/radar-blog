@@ -2,19 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-  Key, Plus, Trash2, GitBranch, Copy, Check, Info, RefreshCw, Webhook,
+  Plus, Trash2, GitBranch, Copy, Check, Info, RefreshCw, Webhook,
   Shield, Server, Bot, Save, ChevronDown, ChevronUp,
 } from "lucide-react";
 
 /* ───── Types ───── */
-
-interface ApiKeyItem {
-  id: string;
-  name: string;
-  active: boolean;
-  createdAt: string;
-  lastUsed: string | null;
-}
 
 interface RepoItem {
   id: string;
@@ -33,6 +25,39 @@ interface EnvItem {
   set: boolean;
   preview: string | null;
 }
+
+interface AiProvider {
+  id: string;
+  label: string;
+  connected: boolean;
+}
+
+/* ───── AI Provider → Model mapping ───── */
+
+const AI_MODELS: Record<string, { label: string; value: string }[]> = {
+  anthropic: [
+    { label: "Claude Sonnet 4", value: "claude-sonnet-4-20250514" },
+    { label: "Claude Haiku 4.5", value: "claude-haiku-4-5-20251001" },
+    { label: "Claude Opus 4", value: "claude-opus-4-20250514" },
+  ],
+  openai: [
+    { label: "GPT-4o", value: "gpt-4o" },
+    { label: "GPT-4o mini", value: "gpt-4o-mini" },
+    { label: "GPT-4.1", value: "gpt-4.1" },
+    { label: "GPT-4.1 mini", value: "gpt-4.1-mini" },
+    { label: "o3", value: "o3" },
+    { label: "o4 mini", value: "o4-mini" },
+  ],
+  google: [
+    { label: "Gemini 2.5 Pro", value: "gemini-2.5-pro" },
+    { label: "Gemini 2.5 Flash", value: "gemini-2.5-flash" },
+    { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash" },
+  ],
+  xai: [
+    { label: "Grok 3", value: "grok-3" },
+    { label: "Grok 3 Mini", value: "grok-3-mini" },
+  ],
+};
 
 /* ───── Collapsible Section ───── */
 
@@ -73,16 +98,12 @@ const Section = ({
 const AdminSettingsPage = () => {
   // env status
   const [envItems, setEnvItems] = useState<EnvItem[]>([]);
+  const [aiProviders, setAiProviders] = useState<AiProvider[]>([]);
 
   // site settings (DB)
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
-
-  // api keys
-  const [apiKeys, setApiKeys] = useState<ApiKeyItem[]>([]);
-  const [newKeyName, setNewKeyName] = useState("");
-  const [generatedKey, setGeneratedKey] = useState("");
 
   // repos
   const [repos, setRepos] = useState<RepoItem[]>([]);
@@ -110,7 +131,10 @@ const AdminSettingsPage = () => {
     try {
       const res = await fetch("/api/admin/env-status");
       const data = await res.json();
-      if (data.success) setEnvItems(data.data);
+      if (data.success) {
+        setEnvItems(data.data.envStatus);
+        setAiProviders(data.data.aiProviders);
+      }
     } catch {
       /* silent */
     }
@@ -121,16 +145,6 @@ const AdminSettingsPage = () => {
       const res = await fetch("/api/admin/settings");
       const data = await res.json();
       if (data.success) setSettings(data.data);
-    } catch {
-      /* silent */
-    }
-  };
-
-  const fetchApiKeys = async () => {
-    try {
-      const res = await fetch("/api/admin/api-keys");
-      const data = await res.json();
-      if (data.success) setApiKeys(data.data);
     } catch {
       /* silent */
     }
@@ -149,7 +163,6 @@ const AdminSettingsPage = () => {
   useEffect(() => {
     fetchEnvStatus();
     fetchSettings();
-    fetchApiKeys();
     fetchRepos();
   }, []);
 
@@ -178,37 +191,6 @@ const AdminSettingsPage = () => {
     } finally {
       setSettingsSaving(false);
     }
-  };
-
-  /* ───── API Key actions ───── */
-
-  const createApiKey = async () => {
-    if (!newKeyName.trim()) return;
-    try {
-      const res = await fetch("/api/admin/api-keys", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newKeyName }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setGeneratedKey(data.data.key);
-        setNewKeyName("");
-        fetchApiKeys();
-      }
-    } catch {
-      alert("API Key 생성에 실패했습니다.");
-    }
-  };
-
-  const deleteApiKey = async (id: string) => {
-    if (!confirm("비활성화하시겠습니까?")) return;
-    await fetch("/api/admin/api-keys", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    fetchApiKeys();
   };
 
   /* ───── Repo actions ───── */
@@ -406,21 +388,87 @@ const AdminSettingsPage = () => {
 
       {/* ── 3. AI 글 생성 설정 ── */}
       <Section title="AI 글 생성 설정" icon={Bot}>
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* 1차: 프로바이더 선택 */}
+          <div>
+            <label className="mb-2 block text-meta font-medium text-text-secondary">
+              AI 프로바이더
+            </label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {aiProviders.map((provider) => {
+                const selected = (settings["ai_provider"] ?? "anthropic") === provider.id;
+                return (
+                  <button
+                    key={provider.id}
+                    onClick={() => {
+                      updateSetting("ai_provider", provider.id);
+                      // 프로바이더 변경 시 해당 프로바이더의 첫 모델로 자동 설정
+                      const models = AI_MODELS[provider.id];
+                      if (models?.[0]) updateSetting("ai_model", models[0].value);
+                    }}
+                    className={`relative rounded-lg border px-4 py-3 text-left transition-all ${
+                      selected
+                        ? "border-brand-primary bg-[rgba(49,130,246,0.08)]"
+                        : "border-border hover:border-text-muted"
+                    }`}
+                  >
+                    <div className="text-card-desc font-medium">{provider.label}</div>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span
+                        className={`inline-block h-2 w-2 rounded-full ${
+                          provider.connected ? "bg-cat-commits" : "bg-cat-casual"
+                        }`}
+                      />
+                      <span className="text-[0.7rem] text-text-muted">
+                        {provider.connected ? "연결됨" : "연결 안 됨"}
+                      </span>
+                    </div>
+                    {selected && (
+                      <div className="absolute right-2 top-2">
+                        <Check size={14} className="text-brand-primary" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {(() => {
+              const selectedProvider = aiProviders.find(
+                (p) => p.id === (settings["ai_provider"] ?? "anthropic"),
+              );
+              if (selectedProvider && !selectedProvider.connected) {
+                return (
+                  <p className="mt-2 text-meta text-cat-casual">
+                    Railway 환경변수에 해당 API Key를 설정해주세요.
+                  </p>
+                );
+              }
+              return null;
+            })()}
+          </div>
+
+          {/* 2차: 모델 선택 */}
           <div>
             <label className="mb-1 block text-meta font-medium text-text-secondary">
-              Claude 모델
+              모델
             </label>
             <select
-              value={settings["ai_model"] ?? "claude-sonnet-4-20250514"}
+              value={
+                settings["ai_model"] ??
+                (AI_MODELS[settings["ai_provider"] ?? "anthropic"]?.[0]?.value || "")
+              }
               onChange={(e) => updateSetting("ai_model", e.target.value)}
               className="w-full rounded-lg border border-border bg-bg-primary px-3 py-2 text-card-desc outline-none focus:border-brand-primary"
             >
-              <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
-              <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
-              <option value="claude-opus-4-20250514">Claude Opus 4</option>
+              {(AI_MODELS[settings["ai_provider"] ?? "anthropic"] ?? []).map((model) => (
+                <option key={model.value} value={model.value}>
+                  {model.label}
+                </option>
+              ))}
             </select>
           </div>
+
+          {/* 기타 설정 */}
           <div>
             <label className="mb-1 block text-meta font-medium text-text-secondary">
               기본 글 언어
@@ -488,61 +536,6 @@ const AdminSettingsPage = () => {
               <><Save size={14} /> 저장</>
             )}
           </button>
-        </div>
-      </Section>
-
-      {/* ── 4. API Key 관리 ── */}
-      <Section title="API Key 관리" icon={Key}>
-        <div className="mb-4 flex gap-2">
-          <input
-            value={newKeyName}
-            onChange={(e) => setNewKeyName(e.target.value)}
-            placeholder="API Key 이름"
-            onKeyDown={(e) => e.key === "Enter" && createApiKey()}
-            className="flex-1 rounded-lg border border-border bg-bg-primary px-3 py-2 text-card-desc outline-none focus:border-brand-primary"
-          />
-          <button
-            onClick={createApiKey}
-            className="flex items-center gap-1 rounded-lg bg-brand-primary px-4 py-2 text-meta font-medium text-white transition-opacity hover:opacity-90"
-          >
-            <Plus size={14} /> 발급
-          </button>
-        </div>
-        {generatedKey && (
-          <div className="mb-4 rounded-lg border border-cat-commits bg-[rgba(0,196,113,0.08)] p-3">
-            <p className="mb-1 text-meta font-medium text-cat-commits">
-              API Key가 생성되었습니다. 이 키는 다시 표시되지 않습니다:
-            </p>
-            <code className="block break-all font-code text-code-block text-text-primary">
-              {generatedKey}
-            </code>
-          </div>
-        )}
-        <div className="divide-y divide-border-light rounded-lg border border-border">
-          {apiKeys.map((key) => (
-            <div key={key.id} className="flex items-center justify-between px-4 py-3">
-              <div>
-                <div className="text-card-desc font-medium">{key.name}</div>
-                <div className="text-meta text-text-muted">
-                  {key.active ? "활성" : "비활성"} ·{" "}
-                  {new Date(key.createdAt).toLocaleDateString("ko-KR")}
-                  {key.lastUsed &&
-                    ` · 마지막 사용: ${new Date(key.lastUsed).toLocaleDateString("ko-KR")}`}
-                </div>
-              </div>
-              <button
-                onClick={() => deleteApiKey(key.id)}
-                className="rounded p-1 text-text-muted hover:text-cat-casual"
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))}
-          {apiKeys.length === 0 && (
-            <div className="px-4 py-6 text-center text-meta text-text-muted">
-              등록된 API Key가 없습니다.
-            </div>
-          )}
         </div>
       </Section>
 

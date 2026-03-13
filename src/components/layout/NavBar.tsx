@@ -29,7 +29,6 @@ export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
   const navLinks = [
     { label: dict.blog, href: `${prefix}/` },
     { label: dict.projects, href: `${prefix}/about#projects` },
-    { label: dict.about, href: `${prefix}/about` },
     { label: dict.docs, href: `${prefix}/docs` },
   ];
 

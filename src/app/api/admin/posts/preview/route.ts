@@ -28,12 +28,24 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
+    // Pre-process artifact blocks into iframes for preview
+    const processed = content.replace(
+      /```html:artifact\n([\s\S]*?)```/g,
+      (_match: string, code: string) => {
+        const escaped = code.trim().replace(/"/g, "&quot;");
+        return `<div style="border:1px solid #333538;border-radius:12px;overflow:hidden;margin:16px 0">
+<div style="padding:8px 12px;background:#2B2D31;font-size:12px;color:#6B7684;font-weight:500;display:flex;align-items:center;gap:6px">Interactive Artifact</div>
+<iframe srcdoc="<!DOCTYPE html><html><head><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:sans-serif;background:#212325;color:#ECECEC}</style></head><body>${escaped}</body></html>" sandbox="allow-scripts" style="width:100%;min-height:150px;border:0;background:#212325"></iframe>
+</div>`;
+      }
+    );
+
     const result = await unified()
       .use(remarkParse)
       .use(remarkGfm)
       .use(remarkRehype, { allowDangerousHtml: true })
       .use(rehypeStringify, { allowDangerousHtml: true })
-      .process(content);
+      .process(processed);
 
     return NextResponse.json<ApiResponse>({ success: true, data: String(result) });
   } catch (error) {

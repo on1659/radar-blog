@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import type { ReactElement } from "react";
 import type { Root, Element, Text } from "hast";
 import type { Plugin } from "unified";
+import { ArtifactBlock } from "@/components/post/ArtifactBlock";
 
 const getTextContent = (node: Element): string => {
   let text = "";
@@ -38,9 +39,25 @@ const rehypeHeadingIds: Plugin<[], Root> = () => (tree) => {
   visit(tree);
 };
 
+const preprocessArtifacts = (source: string): string => {
+  // Replace ```html:artifact ... ``` with MDX component tags
+  return source.replace(
+    /```html:artifact\n([\s\S]*?)```/g,
+    (_match, code: string) => {
+      const encoded = Buffer.from(code.trim()).toString("base64");
+      return `<ArtifactBlock code="${encoded}" />`;
+    }
+  );
+};
+
 export const renderMarkdown = async (source: string): Promise<ReactElement> => {
+  const processed = preprocessArtifacts(source);
+
   const { content } = await compileMDX({
-    source,
+    source: processed,
+    components: {
+      ArtifactBlock,
+    },
     options: {
       mdxOptions: {
         remarkPlugins: [remarkGfm],

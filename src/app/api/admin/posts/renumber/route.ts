@@ -20,16 +20,27 @@ export const POST = async () => {
       select: { id: true, slug: true },
     });
 
+    // 2-pass: 먼저 임시 slug로 변경 후, 최종 번호로 재설정 (unique constraint 회피)
     let updated = 0;
-    for (let i = 0; i < posts.length; i++) {
-      const newSlug = String(i + 1);
-      if (posts[i].slug !== newSlug) {
-        await prisma.post.update({
-          where: { id: posts[i].id },
-          data: { slug: newSlug },
-        });
-        updated++;
-      }
+    const toUpdate = posts
+      .map((p, i) => ({ id: p.id, oldSlug: p.slug, newSlug: String(i + 1) }))
+      .filter((p) => p.oldSlug !== p.newSlug);
+
+    // Pass 1: 충돌 방지용 임시 slug
+    for (const p of toUpdate) {
+      await prisma.post.update({
+        where: { id: p.id },
+        data: { slug: `__temp_${p.id}` },
+      });
+    }
+
+    // Pass 2: 최종 번호 할당
+    for (const p of toUpdate) {
+      await prisma.post.update({
+        where: { id: p.id },
+        data: { slug: p.newSlug },
+      });
+      updated++;
     }
 
     return NextResponse.json<ApiResponse>({

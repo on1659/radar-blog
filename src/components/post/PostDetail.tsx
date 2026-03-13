@@ -16,14 +16,8 @@ export const PostDetailHeader = ({
   createdAt,
   readingTime,
 }: PostDetailHeaderProps) => {
-  const dateStr = new Date(createdAt)
-    .toLocaleDateString("ko-KR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    })
-    .replace(/\. /g, ".")
-    .replace(/\.$/, "");
+  const d = new Date(createdAt);
+  const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 
   return (
     <header className="mx-auto max-w-[1000px] px-5 sm:px-8 pt-14">

@@ -230,7 +230,14 @@ const AdminPostsPage = () => {
                     {posts.length - index}
                   </td>
                   <td className="max-w-xs truncate px-4 py-3 text-card-desc font-medium">
-                    {post.title}
+                    <a
+                      href={`/post/${post.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-brand-primary hover:underline"
+                    >
+                      {post.title}
+                    </a>
                   </td>
                   <td className="px-4 py-3 text-meta text-text-tertiary">{post.category}</td>
                   <td className="px-4 py-3">

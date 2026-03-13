@@ -3,6 +3,7 @@ import { NavBar } from "@/components/layout/NavBar";
 import { Footer } from "@/components/layout/Footer";
 import { getDictionary } from "@/i18n";
 import { i18n, isValidLocale } from "@/i18n/config";
+import { auth } from "@/lib/auth";
 import type { Locale } from "@/i18n/config";
 
 export const generateStaticParams = () => {
@@ -19,6 +20,8 @@ const LocaleLayout = async ({
   const { locale: rawLocale } = await params;
   const locale: Locale = isValidLocale(rawLocale) ? rawLocale : i18n.defaultLocale;
   const dict = await getDictionary(locale);
+  const session = await auth();
+  const isAdmin = !!(session?.user as { isAdmin?: boolean } | undefined)?.isAdmin;
 
   return (
     <ThemeProvider
@@ -27,7 +30,7 @@ const LocaleLayout = async ({
       enableSystem
       disableTransitionOnChange
     >
-      <NavBar locale={locale} dict={dict.nav} />
+      <NavBar locale={locale} dict={dict.nav} isAdmin={isAdmin} />
       <main className="min-h-screen" lang={locale}>
         {children}
       </main>

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Menu, X, Globe, ChevronDown } from "lucide-react";
+import { Search, Menu, X, Globe, ChevronDown, Settings } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { i18n, localeNames } from "@/i18n/config";
 import type { Locale } from "@/i18n/config";
@@ -17,7 +17,7 @@ interface NavDict {
   language: string;
 }
 
-export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
+export const NavBar = ({ locale, dict, isAdmin = false }: { locale: Locale; dict: NavDict; isAdmin?: boolean }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -95,6 +95,19 @@ export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
                 {link.label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href={`${prefix}/admin`}
+                className={`flex items-center gap-1 rounded-md px-3 py-1.5 text-[0.9375rem] font-medium transition-all duration-base ${
+                  pathname.startsWith(`${prefix}/admin`)
+                    ? "font-semibold text-text-primary"
+                    : "text-text-tertiary hover:bg-bg-secondary hover:text-text-primary"
+                }`}
+              >
+                <Settings size={14} />
+                Admin
+              </Link>
+            )}
           </div>
         </div>
 
@@ -162,6 +175,20 @@ export const NavBar = ({ locale, dict }: { locale: Locale; dict: NavDict }) => {
               {link.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              href={`${prefix}/admin`}
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center gap-1 rounded-md px-3 py-2 text-[0.9375rem] font-medium transition-all duration-base ${
+                pathname.startsWith(`${prefix}/admin`)
+                  ? "font-semibold text-text-primary"
+                  : "text-text-tertiary hover:text-text-primary"
+              }`}
+            >
+              <Settings size={14} />
+              Admin
+            </Link>
+          )}
         </div>
       )}
     </nav>

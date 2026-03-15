@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 const AdminDashboard = async () => {
@@ -55,14 +56,18 @@ const AdminDashboard = async () => {
       <h2 className="mb-3 text-sub-heading">최근 발행</h2>
       <div className="divide-y divide-border-light rounded-xl border border-border">
         {recent.map((post) => (
-          <div key={post.id} className="flex items-center justify-between px-4 py-3">
+          <Link
+            key={post.id}
+            href={`/post/${post.slug}`}
+            className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-bg-secondary"
+          >
             <div>
               <div className="text-card-desc font-medium">{post.title}</div>
               <div className="text-meta text-text-tertiary">
                 {post.category} · {post.createdAt.toLocaleDateString("ko-KR")}
               </div>
             </div>
-          </div>
+          </Link>
         ))}
         {recent.length === 0 && (
           <div className="px-4 py-8 text-center text-text-muted">

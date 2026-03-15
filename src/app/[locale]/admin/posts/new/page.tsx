@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, Eye, EyeOff, Code, FileText, Globe } from "lucide-react";
+import { Upload, Code, FileText, Globe, Columns2, Eye, PenLine } from "lucide-react";
 
 const CATEGORIES = ["commits", "articles", "techlab", "casual"] as const;
 
@@ -49,10 +49,11 @@ const NewPostPage = () => {
   const [contentKo, setContentKo] = useState("");
   const [contentEn, setContentEn] = useState("");
   const [published, setPublished] = useState(true);
-  const [preview, setPreview] = useState(false);
+  const [viewMode, setViewMode] = useState<"edit" | "split" | "preview">("edit");
   const [saving, setSaving] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
   const [activeLang, setActiveLang] = useState<"ko" | "en">("ko");
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeContent = activeLang === "ko" ? contentKo : contentEn;
   const setActiveContent = activeLang === "ko" ? setContentKo : setContentEn;
@@ -128,22 +129,29 @@ const NewPostPage = () => {
     }
   };
 
-  const fetchPreview = async () => {
-    if (!preview) {
-      try {
-        const res = await fetch("/api/admin/posts/preview", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: activeContent }),
-        });
-        const data = await res.json();
-        if (data.success) setPreviewHtml(data.data);
-      } catch {
-        setPreviewHtml("<p>미리보기 로드 실패</p>");
-      }
+  const refreshPreview = useCallback(async (content: string) => {
+    try {
+      const res = await fetch("/api/admin/posts/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
+      const data = await res.json();
+      if (data.success) setPreviewHtml(data.data);
+    } catch {
+      setPreviewHtml("<p>미리보기 로드 실패</p>");
     }
-    setPreview(!preview);
-  };
+  }, []);
+
+  // Auto-refresh preview in split/preview mode with debounce
+  useEffect(() => {
+    if (viewMode === "edit") return;
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    previewTimer.current = setTimeout(() => {
+      refreshPreview(activeContent);
+    }, 600);
+    return () => { if (previewTimer.current) clearTimeout(previewTimer.current); };
+  }, [activeContent, viewMode, refreshPreview]);
 
   const handleSave = async () => {
     if (!title.trim() || !contentKo.trim()) {
@@ -184,7 +192,7 @@ const NewPostPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-[900px]">
+    <div className={`mx-auto ${viewMode === "split" ? "max-w-[1400px]" : "max-w-[900px]"} transition-all duration-300`}>
       {/* Top bar */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-section-title">글 작성</h1>
@@ -224,13 +232,35 @@ const NewPostPage = () => {
             <Code size={13} />
             목업 삽입
           </button>
-          <button
-            onClick={fetchPreview}
-            className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-meta font-medium text-text-secondary transition-colors hover:bg-bg-secondary"
-          >
-            {preview ? <EyeOff size={13} /> : <Eye size={13} />}
-            {preview ? "편집" : "미리보기"}
-          </button>
+          <div className="flex overflow-hidden rounded-lg border border-border">
+            <button
+              onClick={() => setViewMode("edit")}
+              className={`flex items-center gap-1 px-3 py-1.5 text-meta font-medium transition-colors ${
+                viewMode === "edit" ? "bg-text-primary text-bg-primary" : "text-text-tertiary hover:bg-bg-secondary"
+              }`}
+            >
+              <PenLine size={13} />
+              편집
+            </button>
+            <button
+              onClick={() => setViewMode("split")}
+              className={`flex items-center gap-1 border-x border-border px-3 py-1.5 text-meta font-medium transition-colors ${
+                viewMode === "split" ? "bg-text-primary text-bg-primary" : "text-text-tertiary hover:bg-bg-secondary"
+              }`}
+            >
+              <Columns2 size={13} />
+              분할
+            </button>
+            <button
+              onClick={() => setViewMode("preview")}
+              className={`flex items-center gap-1 px-3 py-1.5 text-meta font-medium transition-colors ${
+                viewMode === "preview" ? "bg-text-primary text-bg-primary" : "text-text-tertiary hover:bg-bg-secondary"
+              }`}
+            >
+              <Eye size={13} />
+              미리보기
+            </button>
+          </div>
         </div>
       </div>
 
@@ -301,7 +331,7 @@ const NewPostPage = () => {
       {/* Language tabs */}
       <div className="mb-0 flex border-b border-border">
         <button
-          onClick={() => { setPreview(false); setActiveLang("ko"); }}
+          onClick={() => { setActiveLang("ko"); }}
           className={`px-5 py-2.5 text-meta font-medium transition-all ${
             activeLang === "ko"
               ? "border-b-2 border-brand-primary text-brand-primary"
@@ -312,7 +342,7 @@ const NewPostPage = () => {
           {contentKo && <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-cat-commits" />}
         </button>
         <button
-          onClick={() => { setPreview(false); setActiveLang("en"); }}
+          onClick={() => { setActiveLang("en"); }}
           className={`px-5 py-2.5 text-meta font-medium transition-all ${
             activeLang === "en"
               ? "border-b-2 border-brand-primary text-brand-primary"
@@ -326,19 +356,13 @@ const NewPostPage = () => {
 
       {/* Content area */}
       <div
-        className="min-h-[500px] rounded-b-xl border border-t-0 border-border"
+        className={`min-h-[500px] rounded-b-xl border border-t-0 border-border ${viewMode === "split" ? "flex" : ""}`}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
-        {preview ? (
-          <div className="p-6">
-            <div
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: previewHtml }}
-            />
-          </div>
-        ) : (
-          <div className="relative">
+        {/* Editor pane */}
+        {viewMode !== "preview" && (
+          <div className={`relative ${viewMode === "split" ? "w-1/2 border-r border-border" : "w-full"}`}>
             <textarea
               ref={textareaRef}
               value={activeContent}
@@ -348,9 +372,9 @@ const NewPostPage = () => {
                   ? "마크다운으로 작성하세요... (.md 파일을 드래그 앤 드롭할 수도 있습니다)"
                   : "Write in markdown... (drag & drop .md files)"
               }
-              className="h-[500px] w-full resize-y rounded-b-xl bg-transparent p-6 font-code text-[14px] leading-[1.7] text-text-primary outline-none placeholder:text-text-muted"
+              className={`h-[500px] w-full resize-y bg-transparent p-6 font-code text-[14px] leading-[1.7] text-text-primary outline-none placeholder:text-text-muted ${viewMode === "edit" ? "rounded-b-xl" : ""}`}
             />
-            {!activeContent && (
+            {!activeContent && viewMode === "edit" && (
               <div className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 text-text-muted">
                 <FileText size={40} strokeWidth={1} />
                 <span className="text-sm">
@@ -360,6 +384,15 @@ const NewPostPage = () => {
                 </span>
               </div>
             )}
+          </div>
+        )}
+        {/* Preview pane */}
+        {viewMode !== "edit" && (
+          <div className={`overflow-y-auto p-6 ${viewMode === "split" ? "w-1/2" : "w-full"}`}>
+            <div
+              className="prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
           </div>
         )}
       </div>

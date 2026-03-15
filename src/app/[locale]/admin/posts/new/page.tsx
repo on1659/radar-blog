@@ -199,7 +199,7 @@ const NewPostPage = () => {
         {preview ? (
           <div className="p-6">
             <div
-              className="prose prose-invert max-w-none"
+              className="prose max-w-none"
               dangerouslySetInnerHTML={{ __html: previewHtml }}
             />
           </div>

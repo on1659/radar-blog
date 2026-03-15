@@ -62,7 +62,7 @@ export const LanguageToggle = ({
       )}
 
       <div className="mx-auto flex max-w-[1000px] gap-12 px-5 sm:px-8">
-        <article className="prose prose-lg max-w-content flex-1 pb-20 pt-10 dark:prose-invert">
+        <article className="prose prose-lg max-w-content flex-1 pb-20 pt-10">
           {isKo ? contentKo : contentEn}
         </article>
         <TableOfContents headings={isKo ? headingsKo : headingsEn} />

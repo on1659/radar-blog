@@ -7,6 +7,7 @@ const gradientMap = {
   articles: "from-[#1A3A6B] to-[#3182F6]",
   techlab: "from-[#3B1A6E] to-[#8B5CF6]",
   casual: "from-[#6B2A10] to-[#FF6B35]",
+  daily: "from-[#134E5E] to-[#06B6D4]",
 } as const;
 
 export const PostItem = ({ post, locale = "ko" }: { post: PostMeta; locale?: string }) => {

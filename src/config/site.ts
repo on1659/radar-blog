@@ -26,6 +26,7 @@ export const siteConfig = {
     { key: "articles", label: "Articles", color: "#3182F6" },
     { key: "techlab", label: "Tech Lab", color: "#8B5CF6" },
     { key: "casual", label: "Casual", color: "#FF6B35" },
+    { key: "daily", label: "Daily AI", color: "#06B6D4" },
   ],
   projects: [
     {

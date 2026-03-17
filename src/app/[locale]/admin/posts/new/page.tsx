@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, Code, FileText, Globe, Columns2, Eye, PenLine } from "lucide-react";
 
-const CATEGORIES = ["commits", "articles", "techlab", "casual"] as const;
+const CATEGORIES = ["commits", "articles", "techlab", "casual", "daily"] as const;
 
 interface Frontmatter {
   title?: string;

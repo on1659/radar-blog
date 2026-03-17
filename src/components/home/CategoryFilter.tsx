@@ -9,6 +9,7 @@ interface CategoryDict {
   articles: string;
   techlab: string;
   casual: string;
+  daily: string;
 }
 
 export const CategoryFilter = ({
@@ -30,6 +31,7 @@ export const CategoryFilter = ({
     articles: dict.articles,
     techlab: dict.techlab,
     casual: dict.casual,
+    daily: dict.daily,
   };
 
   const handleFilter = (key: string) => {

@@ -6,6 +6,7 @@ const categoryDot: Record<Category, string> = {
   articles: "bg-cat-articles",
   techlab: "bg-cat-techlab",
   casual: "bg-cat-casual",
+  daily: "bg-cat-daily",
 };
 
 interface RecentPostsSidebarProps {

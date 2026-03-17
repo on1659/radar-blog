@@ -5,6 +5,7 @@ const categoryStyles: Record<Category, string> = {
   articles: "bg-[rgba(49,130,246,0.12)] text-cat-articles",
   techlab: "bg-[rgba(139,92,246,0.12)] text-cat-techlab",
   casual: "bg-[rgba(255,107,53,0.12)] text-cat-casual",
+  daily: "bg-[rgba(6,182,212,0.12)] text-cat-daily",
 };
 
 const categoryLabels: Record<Category, string> = {
@@ -12,6 +13,7 @@ const categoryLabels: Record<Category, string> = {
   articles: "articles",
   techlab: "tech lab",
   casual: "casual",
+  daily: "daily ai",
 };
 
 export const Badge = ({ category }: { category: Category }) => {

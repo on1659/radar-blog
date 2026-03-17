@@ -32,6 +32,7 @@ const config: Config = {
           articles: "#3182F6",
           techlab: "#8B5CF6",
           casual: "#FF6B35",
+          daily: "#06B6D4",
         },
         code: {
           bg: "var(--code-bg)",

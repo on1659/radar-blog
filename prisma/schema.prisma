@@ -126,4 +126,5 @@ enum Category {
   articles
   techlab
   casual
+  daily
 }

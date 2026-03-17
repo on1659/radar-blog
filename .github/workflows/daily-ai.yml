@@ -1,0 +1,29 @@
+name: Daily AI Post
+
+on:
+  schedule:
+    # 매시 정각 실행 (UTC)
+    - cron: '0 * * * *'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Daily AI Post
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://radarlog.kr/api/v1/daily-ai/trigger" \
+            -H "Authorization: Bearer ${{ secrets.BLOG_API_KEY }}" \
+            -H "Content-Type: application/json")
+
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | sed '$d')
+
+          echo "Status: $http_code"
+          echo "Response: $body"
+
+          if [ "$http_code" -ge 400 ]; then
+            echo "::error::API call failed with status $http_code"
+            exit 1
+          fi

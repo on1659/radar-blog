@@ -12,7 +12,7 @@ const PROVIDER_CONFIGS: Record<string, { baseURL: string; envKey: string; defaul
   custom:    { baseURL: "", envKey: "AI_API_KEY", defaultModel: "claude-sonnet-4-20250514" },
 };
 
-const getAIConfig = async (): Promise<{ baseURL: string; apiKey: string; model: string }> => {
+export const getAIConfig = async (): Promise<{ baseURL: string; apiKey: string; model: string }> => {
   // Fast path: generic env vars override everything
   if (process.env.AI_BASE_URL && process.env.AI_API_KEY) {
     return {

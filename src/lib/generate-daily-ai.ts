@@ -3,12 +3,7 @@ import OpenAI from "openai";
 import { prisma } from "./prisma";
 import { calculateReadingTime } from "./markdown";
 import { fetchAINews, type NewsItem } from "./fetch-ai-news";
-
-const getClient = () =>
-  new OpenAI({
-    apiKey: process.env.Z_AI_API_KEY || "dummy",
-    baseURL: "https://api.z.ai/api/coding/paas/v4",
-  });
+import { getAIConfig } from "./claude";
 
 const DAILY_AI_PROMPT = `당신은 "이더"라는 개발자의 기술 블로그에서 AI 뉴스 다이제스트를 작성하는 역할입니다.
 수집된 AI 관련 뉴스를 바탕으로 하나의 블로그 글을 작성합니다.
@@ -89,13 +84,16 @@ export const generateDailyAIPost = async (): Promise<{
     return { postId: null, skipped: true, reason: `Only ${freshNews.length} fresh news items (need at least 2)` };
   }
 
-  // Claude로 글 생성
+  // AI로 글 생성 (공유 설정 사용)
+  const { baseURL, apiKey, model } = await getAIConfig();
+  const client = new OpenAI({ apiKey, baseURL });
+
   const newsContext = freshNews
     .map((n, i) => `${i + 1}. ${n.title}\n   URL: ${n.url}\n   Points: ${n.points}`)
     .join("\n");
 
-  const response = await getClient().chat.completions.create({
-    model: "glm-5",
+  const response = await client.chat.completions.create({
+    model,
     max_tokens: 6000,
     messages: [
       { role: "system", content: DAILY_AI_PROMPT },

@@ -3,7 +3,7 @@ import { authenticateApiKey } from "@/lib/api-auth";
 import { generateDailyAIPost } from "@/lib/generate-daily-ai";
 import type { ApiResponse } from "@/types";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export const POST = async (req: NextRequest) => {
   const authResult = await authenticateApiKey(req);

@@ -48,16 +48,16 @@ const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
       priority: 0.7,
     },
     {
-      url: `${siteConfig.url}/techlab`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
       url: `${siteConfig.url}/casual`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.6,
+    },
+    {
+      url: `${siteConfig.url}/signal`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.7,
     },
     ...postUrls,
   ];

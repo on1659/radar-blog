@@ -42,14 +42,11 @@ export const Footer = ({ dict }: { dict: FooterDict }) => {
             <Link href="/articles" className="mb-1.5 block text-meta text-text-tertiary transition-colors duration-base hover:text-brand-primary">
               Articles
             </Link>
-            <Link href="/techlab" className="mb-1.5 block text-meta text-text-tertiary transition-colors duration-base hover:text-brand-primary">
-              Tech Lab
-            </Link>
             <Link href="/casual" className="mb-1.5 block text-meta text-text-tertiary transition-colors duration-base hover:text-brand-primary">
               Casual
             </Link>
-            <Link href="/daily" className="mb-1.5 block text-meta text-text-tertiary transition-colors duration-base hover:text-brand-primary">
-              Daily AI
+            <Link href="/signal" className="mb-1.5 block text-meta text-text-tertiary transition-colors duration-base hover:text-brand-primary">
+              AI Signal
             </Link>
           </div>
         </div>

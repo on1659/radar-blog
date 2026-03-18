@@ -4,9 +4,8 @@ import type { PostMeta, Category } from "@/types";
 const categoryDot: Record<Category, string> = {
   commits: "bg-cat-commits",
   articles: "bg-cat-articles",
-  techlab: "bg-cat-techlab",
   casual: "bg-cat-casual",
-  daily: "bg-cat-daily",
+  signal: "bg-cat-signal",
 };
 
 interface RecentPostsSidebarProps {

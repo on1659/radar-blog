@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      { source: "/techlab", destination: "/articles", permanent: true },
+      { source: "/daily", destination: "/signal", permanent: true },
+      { source: "/:locale/techlab", destination: "/:locale/articles", permanent: true },
+      { source: "/:locale/daily", destination: "/:locale/signal", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -124,7 +124,6 @@ model Setting {
 enum Category {
   commits
   articles
-  techlab
   casual
-  daily
+  signal
 }

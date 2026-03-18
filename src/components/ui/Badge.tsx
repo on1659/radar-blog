@@ -3,17 +3,15 @@ import type { Category } from "@/types";
 const categoryStyles: Record<Category, string> = {
   commits: "bg-[rgba(0,196,113,0.12)] text-cat-commits",
   articles: "bg-[rgba(49,130,246,0.12)] text-cat-articles",
-  techlab: "bg-[rgba(139,92,246,0.12)] text-cat-techlab",
   casual: "bg-[rgba(255,107,53,0.12)] text-cat-casual",
-  daily: "bg-[rgba(6,182,212,0.12)] text-cat-daily",
+  signal: "bg-[rgba(6,182,212,0.12)] text-cat-signal",
 };
 
 const categoryLabels: Record<Category, string> = {
   commits: "commits",
   articles: "articles",
-  techlab: "tech lab",
   casual: "casual",
-  daily: "daily ai",
+  signal: "ai signal",
 };
 
 export const Badge = ({ category }: { category: Category }) => {

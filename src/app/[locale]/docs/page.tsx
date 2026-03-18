@@ -160,8 +160,8 @@ const DocsPage = () => (
                 <td className="py-2.5">
                   <code className="rounded bg-bg-secondary px-1 py-0.5 text-[0.75rem]">commits</code>{" "}
                   <code className="rounded bg-bg-secondary px-1 py-0.5 text-[0.75rem]">articles</code>{" "}
-                  <code className="rounded bg-bg-secondary px-1 py-0.5 text-[0.75rem]">techlab</code>{" "}
-                  <code className="rounded bg-bg-secondary px-1 py-0.5 text-[0.75rem]">casual</code>
+                  <code className="rounded bg-bg-secondary px-1 py-0.5 text-[0.75rem]">casual</code>{" "}
+                  <code className="rounded bg-bg-secondary px-1 py-0.5 text-[0.75rem]">signal</code>
                 </td>
               </tr>
             </tbody>

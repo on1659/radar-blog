@@ -17,8 +17,8 @@ export const POST = async (req: NextRequest) => {
       revalidatePath("/");
       revalidatePath("/commits");
       revalidatePath("/articles");
-      revalidatePath("/techlab");
       revalidatePath("/casual");
+      revalidatePath("/signal");
       revalidatePath("/series");
     }
 

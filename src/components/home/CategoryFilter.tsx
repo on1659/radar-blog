@@ -7,9 +7,8 @@ interface CategoryDict {
   all: string;
   commits: string;
   articles: string;
-  techlab: string;
   casual: string;
-  daily: string;
+  signal: string;
 }
 
 export const CategoryFilter = ({
@@ -29,9 +28,8 @@ export const CategoryFilter = ({
     all: dict.all,
     commits: dict.commits,
     articles: dict.articles,
-    techlab: dict.techlab,
     casual: dict.casual,
-    daily: dict.daily,
+    signal: dict.signal,
   };
 
   const handleFilter = (key: string) => {

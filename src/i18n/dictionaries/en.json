@@ -22,16 +22,14 @@
     "all": "All",
     "commits": "Commits",
     "articles": "Articles",
-    "techlab": "Tech Lab",
     "casual": "Casual",
-    "daily": "Daily AI"
+    "signal": "AI Signal"
   },
   "categoryDesc": {
     "commits": "Auto-generated development logs from GitHub commits",
     "articles": "Organized technical articles and tutorials",
-    "techlab": "Experimental tech research and benchmarks",
     "casual": "Dev talks, retrospectives, and daily life",
-    "daily": "Latest AI news and updates"
+    "signal": "Latest AI news and signals"
   },
   "post": {
     "minRead": "min read",

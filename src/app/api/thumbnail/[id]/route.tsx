@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 const categoryStyles: Record<string, { bg: string; accent: string }> = {
   commits: { bg: "#0A2E1F", accent: "#00C471" },
   articles: { bg: "#0F1F3D", accent: "#3182F6" },
-  techlab: { bg: "#1F0F3D", accent: "#8B5CF6" },
   casual: { bg: "#2E1508", accent: "#FF6B35" },
+  signal: { bg: "#0B2E34", accent: "#06B6D4" },
 };
 
 export const GET = async (

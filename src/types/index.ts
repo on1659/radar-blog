@@ -1,4 +1,4 @@
-export type Category = "commits" | "articles" | "techlab" | "casual" | "daily";
+export type Category = "commits" | "articles" | "casual" | "signal";
 
 export interface PostMeta {
   id: string;

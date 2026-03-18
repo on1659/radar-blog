@@ -39,8 +39,8 @@ radar-blog/
 │   │   │   ├── page.tsx               # 커밋 카테고리 피드
 │   │   │   └── [project]/page.tsx     # 프로젝트별 커밋 기록
 │   │   ├── articles/page.tsx
-│   │   ├── techlab/page.tsx
 │   │   ├── casual/page.tsx
+│   │   ├── signal/page.tsx            # AI Signal (AI 뉴스)
 │   │   ├── post/[slug]/page.tsx       # 글 상세
 │   │   ├── about/page.tsx             # 소개
 │   │   ├── search/page.tsx            # 검색 결과
@@ -125,7 +125,7 @@ radar-blog/
 **컬러:**
 - 라이트: #FFFFFF 바탕, #1B1D1F 텍스트, #3182F6 액센트
 - 다크: #1B1D1F 바탕, #ECECEC 텍스트, #60A5FA 액센트
-- 카테고리: commits=#00C471, articles=#3182F6, techlab=#8B5CF6, casual=#FF6B35
+- 카테고리: commits=#00C471, articles=#3182F6, casual=#FF6B35, signal=#06B6D4
 - 코드 블록: #191A1C 배경
 
 **타이포:**

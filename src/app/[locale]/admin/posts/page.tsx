@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { PostMeta } from "@/types";
 
-const CATEGORIES = ["commits", "articles", "techlab", "casual", "daily"] as const;
+const CATEGORIES = ["commits", "articles", "casual", "signal"] as const;
 
 const AdminPostsPage = () => {
   const router = useRouter();

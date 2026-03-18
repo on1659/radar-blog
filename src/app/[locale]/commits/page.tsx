@@ -2,9 +2,11 @@ export const revalidate = 3600;
 
 import { prisma } from "@/lib/prisma";
 import { PostList } from "@/components/post/PostList";
+import { PostItem } from "@/components/post/PostItem";
 import { Pagination } from "@/components/home/Pagination";
 import Link from "next/link";
 import type { Metadata } from "next";
+import type { PostMeta } from "@/types";
 
 export const metadata: Metadata = { title: "Commits" };
 
@@ -61,6 +63,18 @@ const CommitsPage = async ({
     filesChanged: p.filesChanged ?? undefined,
   }));
 
+  // 프로젝트 미선택 시 repoName으로 그룹핑
+  const grouped = !currentProject
+    ? Array.from(
+        mapped.reduce((acc, post) => {
+          const key = post.repoName || "기타";
+          if (!acc.has(key)) acc.set(key, []);
+          acc.get(key)!.push(post);
+          return acc;
+        }, new Map<string, PostMeta[]>())
+      )
+    : null;
+
   return (
     <div>
       <div className="mx-auto max-w-container px-5 sm:px-8 pt-12">
@@ -96,7 +110,33 @@ const CommitsPage = async ({
           </div>
         )}
       </div>
-      <PostList posts={mapped} />
+
+      {grouped ? (
+        <div className="mx-auto max-w-container px-5 sm:px-8 pb-16 pt-6">
+          {grouped.map(([projectName, projectPosts], idx) => (
+            <div key={projectName}>
+              {idx > 0 && <div className="my-6 border-t border-border" />}
+              <div className="mb-2 flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-cat-commits" />
+                <h2 className="text-[0.9375rem] font-semibold text-text-primary">
+                  {projectName}
+                </h2>
+                <span className="text-meta text-text-muted">
+                  {projectPosts.length}
+                </span>
+              </div>
+              <div className="flex flex-col gap-px">
+                {projectPosts.map((post) => (
+                  <PostItem key={post.id} post={post} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <PostList posts={mapped} />
+      )}
+
       {totalPages > 1 && (
         <div className="mx-auto max-w-container px-5 sm:px-8 pb-16">
           <Pagination

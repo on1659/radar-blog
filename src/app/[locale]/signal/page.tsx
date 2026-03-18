@@ -5,11 +5,11 @@ import { PostList } from "@/components/post/PostList";
 import { Pagination } from "@/components/home/Pagination";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Daily AI" };
+export const metadata: Metadata = { title: "AI Signal" };
 
 const PAGE_SIZE = 10;
 
-const DailyPage = async ({
+const SignalPage = async ({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string }>;
@@ -17,7 +17,7 @@ const DailyPage = async ({
   const sp = await searchParams;
   const page = Math.max(1, Number(sp.page) || 1);
 
-  const where = { published: true, category: "daily" as const };
+  const where = { published: true, category: "signal" as const };
 
   const [posts, total] = await Promise.all([
     prisma.post.findMany({
@@ -52,9 +52,9 @@ const DailyPage = async ({
   return (
     <div>
       <div className="mx-auto max-w-container px-5 sm:px-8 pt-12">
-        <h1 className="text-section-title">Daily AI</h1>
+        <h1 className="text-section-title">AI Signal</h1>
         <p className="mt-2 text-card-desc text-text-secondary">
-          AI 관련 최신 뉴스와 업데이트
+          AI 관련 최신 뉴스와 시그널
         </p>
       </div>
       <PostList posts={mapped} />
@@ -67,4 +67,4 @@ const DailyPage = async ({
   );
 };
 
-export default DailyPage;
+export default SignalPage;

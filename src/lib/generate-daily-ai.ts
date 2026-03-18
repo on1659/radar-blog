@@ -50,7 +50,7 @@ export const generateDailyAIPost = async (): Promise<{
   // 1시간 내 이미 생성된 daily 글이 있으면 스킵
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const recentCount = await prisma.post.count({
-    where: { category: "daily", createdAt: { gte: oneHourAgo } },
+    where: { category: "signal", createdAt: { gte: oneHourAgo } },
   });
 
   if (recentCount >= HOURLY_CAP) {
@@ -67,7 +67,7 @@ export const generateDailyAIPost = async (): Promise<{
   // 이미 다룬 뉴스 URL 확인 (최근 24시간 daily 글의 content에서)
   const recentDailyPosts = await prisma.post.findMany({
     where: {
-      category: "daily",
+      category: "signal",
       createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
     },
     select: { content: true },
@@ -140,7 +140,7 @@ export const generateDailyAIPost = async (): Promise<{
       excerpt,
       excerptEn,
       slug,
-      category: "daily",
+      category: "signal",
       tags: parsed.tags || ["AI", "Daily"],
       readingTime,
       published: true,
@@ -156,7 +156,7 @@ export const generateDailyAIPost = async (): Promise<{
   // ISR 캐시 갱신
   try {
     revalidatePath("/");
-    revalidatePath("/daily");
+    revalidatePath("/signal");
   } catch {
     console.error("Revalidation failed");
   }

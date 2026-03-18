@@ -37,7 +37,7 @@ const posts = [
     title: "Strix Halo 미니PC에서 로컬 LLM 추론 벤치마크 — Llama 3.1 70B 실험",
     excerpt: "GMKtec EVO-X2에 96GB 통합 메모리를 활용해서 Llama 3.1 70B를 로컬에서 돌려봤다. 토큰 생성 속도와 전력 소비를 API 호출과 비교.",
     content: "# Strix Halo 미니PC에서 로컬 LLM 추론 벤치마크\n\nGMKtec EVO-X2에 96GB 통합 메모리를 활용해서 Llama 3.1 70B를 로컬에서 돌려봤다.\n\n## 하드웨어 스펙\n\nStrix Halo + 96GB LPDDR5X.\n\n## 벤치마크 결과\n\n토큰 생성 속도: 약 12 tok/s.",
-    category: "techlab" as const,
+    category: "articles" as const,
     tags: ["로컬LLM", "벤치마크"],
     readingTime: 15,
     published: true,

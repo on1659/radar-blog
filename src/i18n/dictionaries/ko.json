@@ -22,16 +22,14 @@
     "all": "전체",
     "commits": "Commits",
     "articles": "Articles",
-    "techlab": "Tech Lab",
     "casual": "Casual",
-    "daily": "Daily AI"
+    "signal": "AI Signal"
   },
   "categoryDesc": {
     "commits": "GitHub 커밋 기반으로 자동 생성된 개발 기록",
     "articles": "정리된 기술 글과 튜토리얼",
-    "techlab": "실험적인 기술 연구와 벤치마크",
     "casual": "개발 잡담, 회고, 일상",
-    "daily": "AI 관련 최신 뉴스와 업데이트"
+    "signal": "AI 관련 최신 뉴스와 시그널"
   },
   "post": {
     "minRead": "분 읽기",

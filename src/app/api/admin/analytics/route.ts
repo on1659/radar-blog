@@ -60,7 +60,7 @@ export const GET = async (req: NextRequest) => {
     });
 
     const daily = dailyRaw.map((d) => ({
-      date: d.date.toLocaleDateString("ko-KR", { month: "short", day: "numeric" }),
+      date: d.date.toLocaleDateString("ko-KR", { month: "short", day: "numeric", timeZone: "Asia/Seoul" }),
       views: d._sum.views || 0,
       botViews: d._sum.botViews || 0,
     }));

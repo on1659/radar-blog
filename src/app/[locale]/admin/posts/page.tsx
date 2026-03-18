@@ -261,6 +261,7 @@ const AdminPostsPage = () => {
                       day: "2-digit",
                       hour: "2-digit",
                       minute: "2-digit",
+                      timeZone: "Asia/Seoul",
                     })}
                   </td>
                   <td className="px-4 py-3">

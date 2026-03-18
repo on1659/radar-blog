@@ -64,7 +64,7 @@ const AdminDashboard = async () => {
             <div>
               <div className="text-card-desc font-medium">{post.title}</div>
               <div className="text-meta text-text-tertiary">
-                {post.category} · {post.createdAt.toLocaleDateString("ko-KR")}
+                {post.category} · {post.createdAt.toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}
               </div>
             </div>
           </Link>

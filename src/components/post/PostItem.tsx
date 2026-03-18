@@ -62,8 +62,8 @@ export const PostItem = ({ post, locale = "ko" }: { post: PostMeta; locale?: str
           <span>{locale === "en" ? "Ether" : "이더"}</span>
           <span className="h-0.5 w-0.5 flex-shrink-0 rounded-full bg-text-muted" />
           <span>{locale === "en"
-            ? new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-            : new Date(post.createdAt).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "")
+            ? new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "Asia/Seoul" })
+            : new Date(post.createdAt).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Seoul" }).replace(/\. /g, ".").replace(/\.$/, "")
           }</span>
           <span className="h-0.5 w-0.5 flex-shrink-0 rounded-full bg-text-muted" />
           <span>{post.readingTime} min read</span>

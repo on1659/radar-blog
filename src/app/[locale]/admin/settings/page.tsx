@@ -656,8 +656,8 @@ const AdminSettingsPage = () => {
                     </button>
                   </div>
                   <div className="mt-1 text-meta text-text-muted">
-                    생성: {new Date(ak.createdAt).toLocaleDateString("ko-KR")}
-                    {ak.lastUsed && ` · 최근 사용: ${new Date(ak.lastUsed).toLocaleDateString("ko-KR")}`}
+                    생성: {new Date(ak.createdAt).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}
+                    {ak.lastUsed && ` · 최근 사용: ${new Date(ak.lastUsed).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}`}
                   </div>
                 </div>
                 {ak.active && (

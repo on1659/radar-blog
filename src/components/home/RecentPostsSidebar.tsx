@@ -42,6 +42,7 @@ export const RecentPostsSidebar = ({ posts, title }: RecentPostsSidebarProps) =>
                       .toLocaleDateString("ko-KR", {
                         month: "2-digit",
                         day: "2-digit",
+                        timeZone: "Asia/Seoul",
                       })
                       .replace(/\. /g, ".")
                       .replace(/\.$/, "")}

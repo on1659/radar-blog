@@ -7,6 +7,7 @@ interface PostDetailHeaderProps {
   subtitle?: string;
   createdAt: string;
   readingTime: number;
+  viewCount?: number;
 }
 
 export const PostDetailHeader = ({
@@ -15,9 +16,17 @@ export const PostDetailHeader = ({
   subtitle,
   createdAt,
   readingTime,
+  viewCount,
 }: PostDetailHeaderProps) => {
   const d = new Date(createdAt);
-  const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  const dateStr = d.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Seoul",
+  });
 
   return (
     <header className="mx-auto max-w-[1000px] px-5 sm:px-8 pt-14">
@@ -38,8 +47,20 @@ export const PostDetailHeader = ({
           <div className="text-[0.9375rem] font-semibold text-text-primary">
             이더
           </div>
-          <div>
+          <div className="flex items-center gap-1.5">
             {dateStr} · {readingTime} min read
+            {viewCount !== undefined && (
+              <>
+                {" · "}
+                <span className="inline-flex items-center gap-1">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  {viewCount.toLocaleString()}
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>

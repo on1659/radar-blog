@@ -20,6 +20,7 @@ export interface PostMeta {
   repoName?: string;
   filesChanged?: number;
   hasEnglish?: boolean;
+  viewCount?: number;
 }
 
 export interface PostDetail extends PostMeta {

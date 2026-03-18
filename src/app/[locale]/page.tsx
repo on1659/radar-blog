@@ -53,6 +53,7 @@ const getPosts = async (category?: string, project?: string, page = 1) => {
           commitUrl: true,
           repoName: true,
           filesChanged: true,
+          viewCount: true,
           contentEn: true,
         },
       }),

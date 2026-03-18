@@ -4,6 +4,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import { renderMarkdown, extractHeadings } from "@/lib/markdown";
 import { PostDetailHeader } from "@/components/post/PostDetail";
 import { TableOfContents } from "@/components/post/TableOfContents";
@@ -93,7 +94,7 @@ const PostPage = async ({ params }: PageProps) => {
 
   return (
     <>
-      <ViewTracker postId={post.id} />
+      <ViewTracker postId={post.id} isAdmin={!!(await auth())} />
 
       {/* 시리즈 배너 */}
       {seriesInfo && (
@@ -118,6 +119,7 @@ const PostPage = async ({ params }: PageProps) => {
         subtitle={post.subtitle || undefined}
         createdAt={post.createdAt.toISOString()}
         readingTime={post.readingTime}
+        viewCount={post.viewCount}
       />
 
       {hasEnglish && contentEn ? (

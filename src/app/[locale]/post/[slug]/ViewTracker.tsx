@@ -2,8 +2,10 @@
 
 import { useEffect } from "react";
 
-export const ViewTracker = ({ postId }: { postId: string }) => {
+export const ViewTracker = ({ postId, isAdmin = false }: { postId: string; isAdmin?: boolean }) => {
   useEffect(() => {
+    if (isAdmin) return;
+
     const key = `viewed:${postId}`;
     if (sessionStorage.getItem(key)) return;
 
@@ -18,7 +20,7 @@ export const ViewTracker = ({ postId }: { postId: string }) => {
       } catch { /* silent */ }
     };
     track();
-  }, [postId]);
+  }, [postId, isAdmin]);
 
   return null;
 };

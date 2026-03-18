@@ -35,7 +35,7 @@ const ProjectCommitsPage = async ({ params, searchParams }: PageProps) => {
         id: true, slug: true, title: true, subtitle: true, excerpt: true,
         category: true, coverImage: true, tags: true, readingTime: true,
         createdAt: true, published: true, featured: true,
-        commitHash: true, commitUrl: true, repoName: true, filesChanged: true,
+        commitHash: true, commitUrl: true, repoName: true, filesChanged: true, viewCount: true,
       },
     }).catch(() => []),
     prisma.post.count({ where }).catch(() => 0),

@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이더.dev - 마스코트 목업</title>
+<style>
+  /* ===== Reset & Base ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F7F8FA;
+    --bg-tertiary: #ECEEF1;
+    --text-primary: #1B1D1F;
+    --text-secondary: #4E5968;
+    --text-tertiary: #8B95A1;
+    --text-muted: #B0B8C1;
+    --brand-primary: #3182F6;
+    --brand-primary-light: rgba(49, 130, 246, 0.12);
+    --border: #E5E8EB;
+    --card-bg: #FFFFFF;
+    --card-hover: #F7F8FA;
+    --cat-commits: #00C471;
+    --cat-articles: #3182F6;
+    --cat-casual: #FF6B35;
+    --cat-signal: #06B6D4;
+  }
+
+  .dark {
+    --bg-primary: #1B1D1F;
+    --bg-secondary: #212325;
+    --bg-tertiary: #2B2D31;
+    --text-primary: #ECECEC;
+    --text-secondary: #B0B8C1;
+    --text-tertiary: #6B7684;
+    --text-muted: #4E5968;
+    --brand-primary: #60A5FA;
+    --brand-primary-light: #1E3A5F;
+    --border: #333538;
+    --card-bg: #212325;
+    --card-hover: #2B2D31;
+  }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  /* ===== NavBar ===== */
+  .navbar {
+    position: sticky; top: 0; z-index: 50;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-primary);
+    backdrop-filter: blur(8px);
+  }
+  .navbar-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px; padding: 0 2rem;
+  }
+  .logo { font-size: 1.25rem; font-weight: 800; color: var(--text-primary); text-decoration: none; }
+  .logo span { color: var(--brand-primary); }
+  .nav-links { display: flex; gap: 0.5rem; }
+  .nav-links a {
+    padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.9375rem;
+    font-weight: 500; color: var(--text-tertiary); text-decoration: none;
+    transition: all 0.2s;
+  }
+  .nav-links a:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .nav-links a.active { color: var(--text-primary); font-weight: 600; }
+  .nav-right { display: flex; align-items: center; gap: 0.25rem; }
+  .nav-btn {
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; border: none; background: transparent; cursor: pointer;
+    color: var(--text-tertiary); transition: all 0.2s; font-size: 1rem;
+  }
+  .nav-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+
+  /* ===== Section Tabs ===== */
+  .section-tabs {
+    display: flex; gap: 0.75rem; padding: 1rem 0; justify-content: center;
+  }
+  .section-tab {
+    padding: 0.5rem 1.25rem; border-radius: 999px; font-size: 0.875rem;
+    font-weight: 500; border: none; cursor: pointer; transition: all 0.2s;
+    background: var(--bg-secondary); color: var(--text-tertiary);
+  }
+  .section-tab.active { background: var(--brand-primary); color: white; }
+  .section-tab:hover:not(.active) { background: var(--bg-tertiary); color: var(--text-primary); }
+
+  /* ===== Shared Layout ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+
+  /* ===== HERO BANNER ===== */
+  .hero {
+    position: relative; overflow: hidden;
+    background: #1B1D1F; padding: 5rem 2rem; text-align: center;
+  }
+  .dark .hero { background: #0F1012; }
+  .hero-bg {
+    position: absolute; left: -20%; top: -50%; width: 140%; height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(49,130,246,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(139,92,246,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
+  .hero h1 { font-size: 2rem; font-weight: 800; line-height: 1.35; color: white; margin-bottom: 1rem; }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #3182F6, #8B5CF6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p { font-size: 1.0625rem; line-height: 1.7; color: rgba(255,255,255,0.7); }
+
+  /* ===== 마스코트 - 히어로 배너 위 ===== */
+  .hero-mascot-container {
+    position: absolute; bottom: 12px; z-index: 10;
+    width: 100%;
+  }
+  .hero-mascot {
+    position: absolute; bottom: 0;
+    transition: left 2s ease-in-out;
+  }
+
+  /* ===== 픽셀 마스코트 (CSS 기반) ===== */
+  .mascot {
+    width: 48px; height: 56px; position: relative;
+    image-rendering: pixelated;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .mascot:hover { transform: scale(1.1); }
+  .mascot.flip { transform: scaleX(-1); }
+  .mascot.flip:hover { transform: scaleX(-1) scale(1.1); }
+
+  /* 캐릭터 본체 - CSS pixel art 이더 로봇 */
+  .mascot-pixel {
+    width: 48px; height: 56px;
+    position: relative;
+    image-rendering: pixelated;
+  }
+
+  /* SVG 기반 픽셀 캐릭터 */
+  .mascot-svg {
+    width: 48px; height: 56px;
+  }
+
+  /* Idle 애니메이션 - 위아래 부유 */
+  @keyframes mascot-idle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  .mascot.idle { animation: mascot-idle 2s ease-in-out infinite; }
+
+  /* 걷기 애니메이션 */
+  @keyframes mascot-walk {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-2px) rotate(-3deg); }
+    75% { transform: translateY(-2px) rotate(3deg); }
+  }
+  .mascot.walking { animation: mascot-walk 0.4s ease-in-out infinite; }
+
+  /* 눈 깜빡임 */
+  @keyframes blink {
+    0%, 90%, 100% { opacity: 1; }
+    95% { opacity: 0; }
+  }
+  .mascot-eye { animation: blink 3s ease-in-out infinite; }
+
+  /* 말풍선 */
+  .speech-bubble {
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: var(--bg-primary); border: 2px solid var(--border);
+    border-radius: 12px; padding: 8px 14px; font-size: 0.75rem;
+    white-space: nowrap; color: var(--text-primary);
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 8px;
+  }
+  .speech-bubble::after {
+    content: ''; position: absolute; top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: var(--bg-primary);
+  }
+  .mascot-wrapper:hover .speech-bubble { opacity: 1; }
+
+  /* ===== ABOUT 페이지 ===== */
+  .about-hero {
+    text-align: center; padding: 3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .about-avatar-area {
+    position: relative; display: inline-block; margin-bottom: 1.5rem;
+  }
+  .about-avatar {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: var(--bg-tertiary); border: 3px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; color: var(--text-muted);
+  }
+  .about-mascot-float {
+    position: absolute; right: -40px; bottom: -10px;
+  }
+  .about-name { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .about-bio { color: var(--text-secondary); font-size: 1rem; line-height: 1.7; max-width: 480px; margin: 0 auto; }
+
+  /* About 페이지 마스코트 인터랙션 영역 */
+  .about-mascot-zone {
+    background: var(--bg-secondary); border-radius: 16px;
+    padding: 2rem; margin: 2rem 0; text-align: center;
+    border: 1px solid var(--border);
+    position: relative; min-height: 200px; overflow: hidden;
+  }
+  .about-mascot-zone h3 {
+    font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-secondary);
+  }
+  .mascot-playground {
+    position: relative; height: 120px; width: 100%;
+    border-radius: 12px; background: var(--bg-tertiary);
+    border: 1px dashed var(--border);
+    overflow: hidden;
+  }
+  .playground-ground {
+    position: absolute; bottom: 0; width: 100%; height: 24px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--cat-commits) 0px, var(--cat-commits) 16px,
+      transparent 16px, transparent 18px
+    );
+    opacity: 0.15;
+  }
+  .playground-mascot {
+    position: absolute; bottom: 24px;
+    left: 50%; transform: translateX(-50%);
+    cursor: grab;
+  }
+  .playground-mascot:active { cursor: grabbing; }
+
+  /* ===== 404 페이지 ===== */
+  .not-found {
+    text-align: center; padding: 6rem 2rem; min-height: 60vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .not-found-code {
+    font-size: 8rem; font-weight: 800; line-height: 1;
+    background: linear-gradient(135deg, var(--brand-primary), #8B5CF6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+  .not-found-msg {
+    font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;
+  }
+  .not-found-desc {
+    color: var(--text-tertiary); margin-bottom: 2rem;
+  }
+  .not-found-btn {
+    display: inline-block; padding: 0.625rem 1.5rem;
+    background: var(--brand-primary); color: white;
+    border-radius: 8px; font-weight: 600; font-size: 0.9375rem;
+    text-decoration: none; transition: opacity 0.2s;
+  }
+  .not-found-btn:hover { opacity: 0.85; }
+
+  /* 404 마스코트 - 길 잃은 캐릭터 */
+  .lost-mascot-area {
+    margin: 2rem 0; position: relative; height: 120px; width: 300px;
+  }
+  @keyframes lost-wander {
+    0% { left: 20%; transform: scaleX(1); }
+    45% { left: 70%; transform: scaleX(1); }
+    50% { left: 70%; transform: scaleX(-1); }
+    95% { left: 20%; transform: scaleX(-1); }
+    100% { left: 20%; transform: scaleX(1); }
+  }
+  .lost-mascot {
+    position: absolute; bottom: 20px;
+    animation: lost-wander 6s ease-in-out infinite, mascot-walk 0.4s ease-in-out infinite;
+  }
+  /* 물음표 이펙트 */
+  @keyframes question-float {
+    0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+    20%, 80% { opacity: 1; transform: translateY(-10px) scale(1); }
+  }
+  .lost-question {
+    position: absolute; top: -10px; right: -5px;
+    font-size: 1rem; color: var(--brand-primary);
+    animation: question-float 3s ease-in-out infinite;
+    font-weight: 800;
+  }
+  /* 발자국 */
+  .footprints {
+    position: absolute; bottom: 12px; width: 100%;
+    display: flex; justify-content: space-around;
+  }
+  .footprint {
+    width: 6px; height: 4px; border-radius: 50%;
+    background: var(--text-muted); opacity: 0.3;
+  }
+
+  /* ===== 히어로 마스코트 걷기 ===== */
+  @keyframes hero-walk-right {
+    0% { left: -60px; }
+    100% { left: calc(100% + 60px); }
+  }
+  @keyframes hero-walk-left {
+    0% { left: calc(100% + 60px); transform: scaleX(-1); }
+    100% { left: -60px; transform: scaleX(-1); }
+  }
+  .hero-walking-mascot {
+    position: absolute; bottom: 8px;
+    animation: hero-walk-right 18s linear infinite, mascot-walk 0.4s ease-in-out infinite;
+    cursor: pointer; z-index: 15;
+  }
+  .hero-walking-mascot .mascot { pointer-events: auto; }
+  .hero-walking-mascot.reverse {
+    animation: hero-walk-left 22s linear infinite, mascot-walk 0.4s ease-in-out infinite;
+    animation-delay: 5s;
+    bottom: 16px;
+    opacity: 0.5;
+  }
+  /* 히어로 봇 멈춤 상태 */
+  .hero-walking-mascot.paused {
+    animation-play-state: paused !important;
+  }
+  .hero-walking-mascot.paused .mascot {
+    animation: mascot-idle 2s ease-in-out infinite !important;
+  }
+  /* 히어로 봇 말풍선 */
+  .hero-bubble {
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.95); border: 2px solid #3182F6;
+    border-radius: 12px; padding: 8px 14px; font-size: 0.75rem;
+    white-space: nowrap; color: #1B1D1F;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    margin-bottom: 8px; z-index: 20;
+  }
+  .hero-bubble.show { opacity: 1; }
+  .hero-bubble::after {
+    content: ''; position: absolute; top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: rgba(255,255,255,0.95);
+  }
+  /* 히어로 봇 파티클 컨테이너 */
+  .hero-particle-container {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 25; overflow: visible;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    border-top: 1px solid var(--border); padding: 2.5rem 2rem;
+  }
+  .footer-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .footer-logo { font-weight: 800; margin-bottom: 0.5rem; }
+  .footer-logo span { color: var(--brand-primary); }
+  .footer-copy { font-size: 0.75rem; color: var(--text-muted); }
+  .footer-links { display: flex; gap: 2rem; }
+  .footer-col-title {
+    font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.625rem;
+  }
+  .footer-col a {
+    display: block; font-size: 0.75rem; color: var(--text-tertiary);
+    text-decoration: none; margin-bottom: 0.375rem; transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--brand-primary); }
+
+  /* Footer 마스코트 */
+  .footer-mascot-wrapper {
+    position: relative;
+    display: inline-flex; align-items: flex-end; gap: 8px;
+  }
+  .footer-mascot {
+    animation: mascot-idle 2.5s ease-in-out infinite;
+  }
+
+  /* ===== 목업 컨트롤 ===== */
+  .controls {
+    position: fixed; top: 70px; right: 20px; z-index: 100;
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px; width: 220px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .controls h4 { font-size: 0.8125rem; font-weight: 700; margin-bottom: 12px; color: var(--text-secondary); }
+  .controls label {
+    display: flex; align-items: center; gap: 8px; font-size: 0.8125rem;
+    color: var(--text-secondary); margin-bottom: 8px; cursor: pointer;
+  }
+  .controls input[type="checkbox"] { accent-color: var(--brand-primary); }
+  .controls .divider { height: 1px; background: var(--border); margin: 12px 0; }
+  .controls .note { font-size: 0.6875rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* ===== 반응형 ===== */
+  @media (max-width: 640px) {
+    .controls { display: none; }
+    .nav-links { display: none; }
+    .not-found-code { font-size: 5rem; }
+  }
+
+  /* ===== 스크롤바 ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ===== 히어로 배너 마스코트 그림자 ===== */
+  .mascot-shadow {
+    width: 32px; height: 6px; border-radius: 50%;
+    background: rgba(0,0,0,0.3); margin: 0 auto;
+    animation: shadow-pulse 2s ease-in-out infinite;
+  }
+  @keyframes shadow-pulse {
+    0%, 100% { transform: scaleX(1); opacity: 0.3; }
+    50% { transform: scaleX(0.8); opacity: 0.15; }
+  }
+
+  /* ===== 클릭 콤보 인터랙션 ===== */
+
+  /* 스핀 애니메이션 (더블클릭) */
+  @keyframes mascot-spin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(360deg) scale(1.2); }
+    100% { transform: rotate(720deg) scale(1); }
+  }
+  .mascot.spinning { animation: mascot-spin 0.6s ease-in-out; }
+
+  /* 댄스 애니메이션 (5연타) */
+  @keyframes mascot-dance {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    10% { transform: translateY(-8px) rotate(-10deg); }
+    20% { transform: translateY(0) rotate(10deg); }
+    30% { transform: translateY(-12px) rotate(-5deg); }
+    40% { transform: translateY(0) rotate(5deg); }
+    50% { transform: translateY(-6px) rotate(-15deg); }
+    60% { transform: translateY(0) rotate(15deg); }
+    70% { transform: translateY(-10px) rotate(0deg); }
+    80% { transform: translateY(0) rotate(-8deg); }
+    90% { transform: translateY(-4px) rotate(8deg); }
+  }
+  .mascot.dancing { animation: mascot-dance 1.2s ease-in-out; }
+
+  /* 잠자기 (롱프레스) */
+  @keyframes mascot-sleep {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(2px) rotate(3deg); }
+  }
+  .mascot.sleeping { animation: mascot-sleep 2s ease-in-out infinite; }
+
+  /* 무지개 LED 글로우 (10연타) */
+  @keyframes rainbow-glow {
+    0% { filter: hue-rotate(0deg) drop-shadow(0 0 8px #3182F6); }
+    25% { filter: hue-rotate(90deg) drop-shadow(0 0 12px #00C471); }
+    50% { filter: hue-rotate(180deg) drop-shadow(0 0 8px #FF6B35); }
+    75% { filter: hue-rotate(270deg) drop-shadow(0 0 12px #8B5CF6); }
+    100% { filter: hue-rotate(360deg) drop-shadow(0 0 8px #3182F6); }
+  }
+  .mascot.rainbow { animation: rainbow-glow 1.5s ease-in-out infinite; }
+
+  /* 놀란 표정 점프 */
+  @keyframes mascot-surprised {
+    0% { transform: translateY(0) scale(1); }
+    15% { transform: translateY(-20px) scale(1.15, 0.9); }
+    30% { transform: translateY(-24px) scale(0.95, 1.1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+    70% { transform: translateY(-5px) scale(0.98, 1.02); }
+    85% { transform: translateY(-2px) scale(1); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  .mascot.surprised { animation: mascot-surprised 0.5s ease-out; }
+
+  /* 파티클 이펙트 컨테이너 */
+  .particle-container {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 30; overflow: visible;
+  }
+
+  /* 하트 파티클 */
+  @keyframes particle-float-up {
+    0% { opacity: 1; transform: translateY(0) scale(0.5); }
+    50% { opacity: 1; transform: translateY(-30px) scale(1); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.3); }
+  }
+  .particle {
+    position: absolute; pointer-events: none;
+    animation: particle-float-up 0.8s ease-out forwards;
+    font-size: 1rem;
+  }
+
+  /* 별 파티클 (콤보) */
+  @keyframes particle-explode {
+    0% { opacity: 1; transform: translate(0, 0) scale(0.3) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0) rotate(360deg); }
+  }
+  .particle-star {
+    position: absolute; pointer-events: none;
+    animation: particle-explode 0.6s ease-out forwards;
+    font-size: 0.875rem;
+  }
+
+  /* 말풍선 향상 - 감정별 색상 */
+  .speech-bubble.happy { border-color: #00C471; }
+  .speech-bubble.happy::after { border-top-color: var(--bg-primary); }
+  .speech-bubble.excited { border-color: #FF6B35; }
+  .speech-bubble.sleepy { border-color: #8B95A1; }
+  .speech-bubble.rainbow-border {
+    border-image: linear-gradient(135deg, #3182F6, #00C471, #FF6B35, #8B5CF6) 1;
+    border-style: solid; border-width: 2px;
+  }
+
+  /* 감정 상태 표시 바 */
+  .mood-bar {
+    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 3px; opacity: 0; transition: opacity 0.3s;
+  }
+  .mascot-wrapper:hover .mood-bar { opacity: 1; }
+  .mood-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text-muted); transition: background 0.3s, transform 0.2s;
+  }
+  .mood-dot.active { transform: scale(1.4); }
+  .mood-dot.happy { background: #00C471; }
+  .mood-dot.excited { background: #FF6B35; }
+  .mood-dot.love { background: #EF4444; }
+  .mood-dot.sleepy { background: #8B95A1; }
+  .mood-dot.rainbow { background: linear-gradient(135deg, #3182F6, #8B5CF6); }
+
+  /* Zzz 이펙트 */
+  @keyframes zzz-float {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+    30% { opacity: 1; transform: translate(5px, -10px) scale(0.8); }
+    60% { opacity: 0.7; transform: translate(10px, -25px) scale(1); }
+    100% { opacity: 0; transform: translate(15px, -40px) scale(1.2); }
+  }
+  .zzz {
+    position: absolute; top: -5px; right: -10px;
+    font-size: 0.75rem; font-weight: 800; color: var(--brand-primary);
+    pointer-events: none; opacity: 0;
+  }
+  .zzz.active { animation: zzz-float 2s ease-out infinite; }
+  .zzz:nth-child(2) { animation-delay: 0.7s; font-size: 0.625rem; }
+  .zzz:nth-child(3) { animation-delay: 1.4s; font-size: 0.5rem; }
+
+  /* 드래그 중 스타일 */
+  .mascot.dragging {
+    cursor: grabbing !important;
+    filter: drop-shadow(0 4px 12px rgba(49, 130, 246, 0.4));
+    z-index: 100;
+  }
+
+  /* 콤보 카운터 */
+  .combo-counter {
+    position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+    font-size: 0.875rem; font-weight: 800; color: var(--brand-primary);
+    opacity: 0; transition: all 0.2s; pointer-events: none;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    white-space: nowrap;
+  }
+  @keyframes combo-pop {
+    0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+    50% { transform: translateX(-50%) scale(1.3); opacity: 1; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+  }
+  .combo-counter.show { animation: combo-pop 0.3s ease-out forwards; }
+
+  /* 인터랙션 가이드 */
+  .interaction-guide {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-top: 16px;
+  }
+  .guide-chip {
+    padding: 4px 12px; border-radius: 999px; font-size: 0.6875rem;
+    background: var(--bg-secondary); color: var(--text-tertiary);
+    border: 1px solid var(--border); white-space: nowrap;
+  }
+  .guide-chip kbd {
+    background: var(--bg-tertiary); padding: 1px 5px; border-radius: 3px;
+    font-family: monospace; font-size: 0.625rem; margin-right: 3px;
+  }
+</style>
+</head>
+<body>
+  <!-- ===== 컨트롤 패널 ===== -->
+  <div class="controls" id="controls">
+    <h4>목업 컨트롤</h4>
+    <label><input type="checkbox" id="toggle-dark" onchange="toggleDark()"> 다크모드</label>
+    <label><input type="checkbox" id="toggle-hero-mascot" checked onchange="toggleHeroMascot()"> 히어로 마스코트</label>
+    <label><input type="checkbox" id="toggle-footer-mascot" checked onchange="toggleFooterMascot()"> 푸터 마스코트</label>
+    <div class="divider"></div>
+    <div class="note">
+      탭을 클릭해 각 페이지 목업을 확인하세요.<br>
+      마스코트를 클릭하면 인터랙션을 볼 수 있습니다.
+    </div>
+  </div>
+
+  <!-- ===== NavBar ===== -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div style="display:flex;align-items:center;gap:2rem">
+        <a href="#" class="logo">이더<span>.</span>dev</a>
+        <div class="nav-links">
+          <a href="#" class="active">Blog</a>
+          <a href="#">Projects</a>
+          <a href="#">Docs</a>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="nav-btn">🔍</button>
+        <button class="nav-btn" onclick="toggleDark()">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== 섹션 탭 ===== -->
+  <div class="section-tabs">
+    <button class="section-tab active" onclick="showSection('hero')">히어로+마스코트</button>
+    <button class="section-tab" onclick="showSection('about')">About 페이지</button>
+    <button class="section-tab" onclick="showSection('notfound')">404 페이지</button>
+  </div>
+
+  <!-- ===== 1. 히어로 배너 + 마스코트 ===== -->
+  <div class="page-section active" id="section-hero">
+    <section class="hero" id="hero-section">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <h1>코드를 쓰면, <em>글이 된다.</em></h1>
+        <p>GitHub 커밋이 블로그 글이 되는 AI 테크블로그<br>매일의 코드가 기록이 됩니다</p>
+      </div>
+
+      <!-- 히어로 배너 위 걸어다니는 마스코트 -->
+      <div class="hero-mascot-container" id="hero-mascot-area">
+        <div class="hero-walking-mascot" id="hero-mascot-1" onclick="heroMascotClick(this, event)">
+          <div class="hero-particle-container"></div>
+          <div class="hero-bubble" id="hero-bubble-1">안녕!</div>
+          <div class="mascot walking">
+            <svg class="mascot-svg" viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg">
+              <rect x="22" y="0" width="4" height="6" fill="#60A5FA" opacity="0.9"/>
+              <rect x="20" y="0" width="8" height="2" fill="#60A5FA" opacity="0.6"/>
+              <rect x="10" y="6" width="28" height="22" rx="4" fill="#3182F6"/>
+              <rect x="12" y="8" width="24" height="18" rx="3" fill="#1E3A5F"/>
+              <rect x="14" y="10" width="20" height="14" rx="2" fill="#0F172A"/>
+              <rect class="mascot-eye" x="17" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+              <rect class="mascot-eye" x="26" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+              <rect x="20" y="21" width="8" height="1" rx="0.5" fill="#60A5FA" opacity="0.6"/>
+              <rect x="14" y="30" width="20" height="16" rx="3" fill="#3182F6"/>
+              <rect x="16" y="32" width="16" height="12" rx="2" fill="#1E3A5F"/>
+              <rect x="21" y="34" width="6" height="6" rx="1" fill="#00C471"/>
+              <rect x="22" y="35" width="4" height="4" rx="1" fill="#00C471" opacity="0.5"/>
+              <rect x="6" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+              <rect x="34" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+              <rect x="16" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+              <rect x="26" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+              <rect x="14" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+              <rect x="24" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 두 번째 마스코트 (반투명, 뒤쪽) -->
+        <div class="hero-walking-mascot reverse" id="hero-mascot-2" style="opacity:0.35" onclick="heroMascotClick(this, event)">
+          <div class="hero-particle-container"></div>
+          <div class="hero-bubble" id="hero-bubble-2">...?</div>
+          <div class="mascot walking" style="width:36px;height:42px;">
+            <svg class="mascot-svg" viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:42px">
+              <rect x="22" y="0" width="4" height="6" fill="#8B5CF6" opacity="0.9"/>
+              <rect x="20" y="0" width="8" height="2" fill="#8B5CF6" opacity="0.6"/>
+              <rect x="10" y="6" width="28" height="22" rx="4" fill="#8B5CF6"/>
+              <rect x="12" y="8" width="24" height="18" rx="3" fill="#3B1F6E"/>
+              <rect x="14" y="10" width="20" height="14" rx="2" fill="#1A0A3E"/>
+              <rect class="mascot-eye" x="17" y="14" width="5" height="5" rx="1" fill="#A78BFA"/>
+              <rect class="mascot-eye" x="26" y="14" width="5" height="5" rx="1" fill="#A78BFA"/>
+              <rect x="20" y="21" width="8" height="1" rx="0.5" fill="#A78BFA" opacity="0.6"/>
+              <rect x="14" y="30" width="20" height="16" rx="3" fill="#8B5CF6"/>
+              <rect x="16" y="32" width="16" height="12" rx="2" fill="#3B1F6E"/>
+              <rect x="21" y="34" width="6" height="6" rx="1" fill="#FF6B35"/>
+              <rect x="22" y="35" width="4" height="4" rx="1" fill="#FF6B35" opacity="0.5"/>
+              <rect x="6" y="32" width="8" height="4" rx="2" fill="#8B5CF6"/>
+              <rect x="34" y="32" width="8" height="4" rx="2" fill="#8B5CF6"/>
+              <rect x="16" y="46" width="6" height="8" rx="2" fill="#8B5CF6"/>
+              <rect x="26" y="46" width="6" height="8" rx="2" fill="#8B5CF6"/>
+              <rect x="14" y="52" width="10" height="4" rx="2" fill="#3B1F6E"/>
+              <rect x="24" y="52" width="10" height="4" rx="2" fill="#3B1F6E"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 간단한 포스트 리스트 (배경 맥락) -->
+    <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <h2 style="font-size:1.25rem;font-weight:700;">최근 게시물</h2>
+      </div>
+      <div id="post-list">
+        <div style="padding:1rem 0;border-bottom:1px solid var(--border);display:flex;gap:1rem;align-items:flex-start;cursor:pointer;transition:background 0.2s;border-radius:8px;padding-left:8px;padding-right:8px;" onmouseover="this.style.background='var(--card-hover)'" onmouseout="this.style.background='transparent'">
+          <div style="width:200px;height:130px;flex-shrink:0;border-radius:8px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.75rem;">썸네일</div>
+          <div style="flex:1;padding-top:4px;">
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <span style="font-size:0.6875rem;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(0,196,113,0.12);color:#00C471;">Commits</span>
+            </div>
+            <h3 style="font-size:1.0625rem;font-weight:700;line-height:1.4;margin-bottom:6px;">Next.js 15 App Router 마이그레이션 회고</h3>
+            <p style="font-size:0.8125rem;color:var(--text-tertiary);line-height:1.6;">Pages Router에서 App Router로 전환하면서 겪은 이슈들과 해결 방법을 정리합니다...</p>
+            <div style="margin-top:8px;font-size:0.75rem;color:var(--text-muted);">2025.03.15 · 5분 전</div>
+          </div>
+        </div>
+        <div style="padding:1rem 0;border-bottom:1px solid var(--border);display:flex;gap:1rem;align-items:flex-start;cursor:pointer;transition:background 0.2s;border-radius:8px;padding-left:8px;padding-right:8px;" onmouseover="this.style.background='var(--card-hover)'" onmouseout="this.style.background='transparent'">
+          <div style="width:200px;height:130px;flex-shrink:0;border-radius:8px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.75rem;">썸네일</div>
+          <div style="flex:1;padding-top:4px;">
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <span style="font-size:0.6875rem;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(6,182,212,0.12);color:#06B6D4;">AI Signal</span>
+            </div>
+            <h3 style="font-size:1.0625rem;font-weight:700;line-height:1.4;margin-bottom:6px;">Claude 4 Opus가 바꿀 개발 워크플로우</h3>
+            <p style="font-size:0.8125rem;color:var(--text-tertiary);line-height:1.6;">최신 Claude 모델이 개발자 경험에 미칠 영향을 분석합니다...</p>
+            <div style="margin-top:8px;font-size:0.75rem;color:var(--text-muted);">2025.03.14 · 1일 전</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 2. About 페이지 ===== -->
+  <div class="page-section" id="section-about">
+    <div class="container" style="padding-top:2rem;padding-bottom:4rem;max-width:720px;">
+
+      <div class="about-hero">
+        <div class="about-avatar-area">
+          <div class="about-avatar">👤</div>
+          <!-- 아바타 옆 마스코트 -->
+          <div class="about-mascot-float">
+            <div class="mascot-wrapper" id="about-mascot-wrapper" style="position:relative">
+              <div class="particle-container" id="about-particles"></div>
+              <div class="combo-counter" id="about-combo"></div>
+              <div class="speech-bubble" id="about-bubble">안녕하세요! 👋</div>
+              <div class="zzz" id="zzz1">Z</div>
+              <div class="zzz" id="zzz2">Z</div>
+              <div class="zzz" id="zzz3">z</div>
+              <div class="mascot idle" id="about-mascot"
+                   onclick="mascotClick(event)"
+                   ondblclick="mascotDoubleClick(event)"
+                   onmousedown="mascotMouseDown(event)"
+                   onmouseup="mascotMouseUp(event)">
+                <svg class="mascot-svg" viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="22" y="0" width="4" height="6" fill="#60A5FA" opacity="0.9"/>
+                  <rect x="20" y="0" width="8" height="2" fill="#60A5FA" opacity="0.6"/>
+                  <rect x="10" y="6" width="28" height="22" rx="4" fill="#3182F6"/>
+                  <rect x="12" y="8" width="24" height="18" rx="3" fill="#1E3A5F"/>
+                  <rect x="14" y="10" width="20" height="14" rx="2" fill="#0F172A"/>
+                  <rect class="mascot-eye" id="eye-left" x="17" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+                  <rect class="mascot-eye" id="eye-right" x="26" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+                  <rect id="mouth" x="20" y="21" width="8" height="1" rx="0.5" fill="#60A5FA" opacity="0.6"/>
+                  <rect x="14" y="30" width="20" height="16" rx="3" fill="#3182F6"/>
+                  <rect x="16" y="32" width="16" height="12" rx="2" fill="#1E3A5F"/>
+                  <rect id="chest-led" x="21" y="34" width="6" height="6" rx="1" fill="#00C471"/>
+                  <rect id="chest-led-inner" x="22" y="35" width="4" height="4" rx="1" fill="#00C471" opacity="0.5"/>
+                  <rect id="arm-left" x="6" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                  <rect id="arm-right" x="34" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                  <rect x="16" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                  <rect x="26" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                  <rect x="14" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+                  <rect x="24" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+                </svg>
+              </div>
+              <div class="mascot-shadow" style="margin-top:2px;"></div>
+              <div class="mood-bar" id="mood-bar">
+                <div class="mood-dot active happy" title="기분"></div>
+                <div class="mood-dot" title="에너지"></div>
+                <div class="mood-dot" title="애정"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="about-name">이더</div>
+        <div class="about-bio">
+          코드를 쓰고, AI가 글을 씁니다.<br>
+          매일의 커밋이 블로그가 되는 개발자입니다.
+        </div>
+      </div>
+
+      <!-- 마스코트 인터랙션 영역 -->
+      <div class="about-mascot-zone">
+        <h3>🤖 이더봇과 놀아보세요</h3>
+        <div class="mascot-playground" id="playground" onclick="movePlaygroundMascot(event)">
+          <div class="playground-ground"></div>
+          <div class="playground-mascot" id="playground-mascot">
+            <div class="mascot idle" style="width:64px;height:72px;">
+              <svg class="mascot-svg" viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg" style="width:64px;height:72px">
+                <rect x="22" y="0" width="4" height="6" fill="#60A5FA" opacity="0.9"/>
+                <rect x="20" y="0" width="8" height="2" fill="#60A5FA" opacity="0.6"/>
+                <rect x="10" y="6" width="28" height="22" rx="4" fill="#3182F6"/>
+                <rect x="12" y="8" width="24" height="18" rx="3" fill="#1E3A5F"/>
+                <rect x="14" y="10" width="20" height="14" rx="2" fill="#0F172A"/>
+                <rect class="mascot-eye" x="17" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+                <rect class="mascot-eye" x="26" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+                <rect x="20" y="21" width="8" height="1" rx="0.5" fill="#60A5FA" opacity="0.6"/>
+                <rect x="14" y="30" width="20" height="16" rx="3" fill="#3182F6"/>
+                <rect x="16" y="32" width="16" height="12" rx="2" fill="#1E3A5F"/>
+                <rect x="21" y="34" width="6" height="6" rx="1" fill="#00C471"/>
+                <rect x="22" y="35" width="4" height="4" rx="1" fill="#00C471" opacity="0.5"/>
+                <rect x="6" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                <rect x="34" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                <rect x="16" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                <rect x="26" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                <rect x="14" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+                <rect x="24" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <p style="margin-top:12px;font-size:0.75rem;color:var(--text-muted);">클릭하면 이더봇이 이동합니다</p>
+        <div class="interaction-guide">
+          <div class="guide-chip"><kbd>Click</kbd> 말풍선 + 점프</div>
+          <div class="guide-chip"><kbd>x2</kbd> 더블클릭 → 스핀</div>
+          <div class="guide-chip"><kbd>x5</kbd> 5연타 → 댄스</div>
+          <div class="guide-chip"><kbd>x10</kbd> 10연타 → 레인보우</div>
+          <div class="guide-chip"><kbd>Long</kbd> 꾹 누르기 → 수면</div>
+          <div class="guide-chip"><kbd>Drag</kbd> 드래그 이동</div>
+        </div>
+      </div>
+
+      <!-- 기술 스택 섹션 (맥락) -->
+      <div style="margin-top:2rem;">
+        <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;">기술 스택</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="padding:6px 14px;border-radius:8px;background:var(--bg-secondary);font-size:0.8125rem;color:var(--text-secondary);border:1px solid var(--border);">Next.js 15</span>
+          <span style="padding:6px 14px;border-radius:8px;background:var(--bg-secondary);font-size:0.8125rem;color:var(--text-secondary);border:1px solid var(--border);">TypeScript</span>
+          <span style="padding:6px 14px;border-radius:8px;background:var(--bg-secondary);font-size:0.8125rem;color:var(--text-secondary);border:1px solid var(--border);">Tailwind CSS</span>
+          <span style="padding:6px 14px;border-radius:8px;background:var(--bg-secondary);font-size:0.8125rem;color:var(--text-secondary);border:1px solid var(--border);">PostgreSQL</span>
+          <span style="padding:6px 14px;border-radius:8px;background:var(--bg-secondary);font-size:0.8125rem;color:var(--text-secondary);border:1px solid var(--border);">Prisma</span>
+          <span style="padding:6px 14px;border-radius:8px;background:var(--bg-secondary);font-size:0.8125rem;color:var(--text-secondary);border:1px solid var(--border);">Claude API</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 3. 404 페이지 ===== -->
+  <div class="page-section" id="section-notfound">
+    <div class="not-found">
+      <div class="not-found-code">404</div>
+
+      <!-- 길 잃은 마스코트 -->
+      <div class="lost-mascot-area">
+        <div class="footprints">
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+          <div class="footprint"></div>
+        </div>
+        <div class="lost-mascot">
+          <div style="position:relative;">
+            <div class="lost-question">?</div>
+            <div class="mascot" style="width:56px;height:64px;">
+              <svg class="mascot-svg" viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg" style="width:56px;height:64px">
+                <rect x="22" y="0" width="4" height="6" fill="#60A5FA" opacity="0.9"/>
+                <rect x="20" y="0" width="8" height="2" fill="#60A5FA" opacity="0.6"/>
+                <rect x="10" y="6" width="28" height="22" rx="4" fill="#3182F6"/>
+                <rect x="12" y="8" width="24" height="18" rx="3" fill="#1E3A5F"/>
+                <rect x="14" y="10" width="20" height="14" rx="2" fill="#0F172A"/>
+                <!-- 헷갈린 눈 (X 모양) -->
+                <line x1="17" y1="14" x2="22" y2="19" stroke="#60A5FA" stroke-width="1.5"/>
+                <line x1="22" y1="14" x2="17" y2="19" stroke="#60A5FA" stroke-width="1.5"/>
+                <line x1="26" y1="14" x2="31" y2="19" stroke="#60A5FA" stroke-width="1.5"/>
+                <line x1="31" y1="14" x2="26" y2="19" stroke="#60A5FA" stroke-width="1.5"/>
+                <!-- 입 (당황) -->
+                <rect x="21" y="21" width="6" height="2" rx="1" fill="#60A5FA" opacity="0.4"/>
+                <rect x="14" y="30" width="20" height="16" rx="3" fill="#3182F6"/>
+                <rect x="16" y="32" width="16" height="12" rx="2" fill="#1E3A5F"/>
+                <!-- 가슴 LED (빨간색 = 에러) -->
+                <rect x="21" y="34" width="6" height="6" rx="1" fill="#EF4444"/>
+                <rect x="22" y="35" width="4" height="4" rx="1" fill="#EF4444" opacity="0.5"/>
+                <rect x="6" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                <rect x="34" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                <rect x="16" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                <rect x="26" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                <rect x="14" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+                <rect x="24" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+              </svg>
+            </div>
+            <div class="mascot-shadow" style="margin-top:2px;width:40px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="not-found-msg">페이지를 찾을 수 없습니다</div>
+      <div class="not-found-desc">이더봇도 길을 잃은 것 같아요...</div>
+      <a href="#" class="not-found-btn" onclick="showSection('hero');return false;">홈으로 돌아가기</a>
+    </div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-mascot-wrapper">
+          <div class="footer-mascot" id="footer-mascot-el">
+            <div class="mascot idle" style="width:32px;height:36px;">
+              <svg class="mascot-svg" viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:36px">
+                <rect x="22" y="0" width="4" height="6" fill="#60A5FA" opacity="0.9"/>
+                <rect x="20" y="0" width="8" height="2" fill="#60A5FA" opacity="0.6"/>
+                <rect x="10" y="6" width="28" height="22" rx="4" fill="#3182F6"/>
+                <rect x="12" y="8" width="24" height="18" rx="3" fill="#1E3A5F"/>
+                <rect x="14" y="10" width="20" height="14" rx="2" fill="#0F172A"/>
+                <rect class="mascot-eye" x="17" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+                <rect class="mascot-eye" x="26" y="14" width="5" height="5" rx="1" fill="#60A5FA"/>
+                <rect x="20" y="21" width="8" height="1" rx="0.5" fill="#60A5FA" opacity="0.6"/>
+                <rect x="14" y="30" width="20" height="16" rx="3" fill="#3182F6"/>
+                <rect x="16" y="32" width="16" height="12" rx="2" fill="#1E3A5F"/>
+                <rect x="21" y="34" width="6" height="6" rx="1" fill="#00C471"/>
+                <rect x="6" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                <rect x="34" y="32" width="8" height="4" rx="2" fill="#3182F6"/>
+                <rect x="16" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                <rect x="26" y="46" width="6" height="8" rx="2" fill="#3182F6"/>
+                <rect x="14" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+                <rect x="24" y="52" width="10" height="4" rx="2" fill="#1E3A5F"/>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div class="footer-logo">이더<span>.</span>dev</div>
+            <div class="footer-copy">© 2025 이더. All rights reserved.</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <div class="footer-col-title">Links</div>
+          <a href="#">GitHub</a>
+          <a href="#">RSS Feed</a>
+          <a href="#">Email</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Categories</div>
+          <a href="#">Commits</a>
+          <a href="#">Articles</a>
+          <a href="#">Casual</a>
+          <a href="#">AI Signal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ===== 섹션 전환 =====
+    function showSection(name) {
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('section-' + name).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // ===== 다크모드 토글 =====
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+      document.getElementById('toggle-dark').checked = document.body.classList.contains('dark');
+    }
+
+    // ===== 히어로/푸터 마스코트 토글 =====
+    function toggleHeroMascot() {
+      const area = document.getElementById('hero-mascot-area');
+      area.style.display = document.getElementById('toggle-hero-mascot').checked ? 'block' : 'none';
+    }
+    function toggleFooterMascot() {
+      const el = document.getElementById('footer-mascot-el');
+      el.style.display = document.getElementById('toggle-footer-mascot').checked ? 'block' : 'none';
+    }
+
+    // ============================================
+    // ===== 마스코트 인터랙션 시스템 =====
+    // ============================================
+
+    const mascotState = {
+      clickCount: 0,        // 연속 클릭 카운트
+      comboTimer: null,     // 콤보 타이머
+      longPressTimer: null, // 롱프레스 타이머
+      isSleeping: false,    // 수면 상태
+      isDragging: false,    // 드래그 상태
+      mood: 'happy',        // 현재 감정
+      energy: 3,            // 에너지 (0~5)
+      love: 0,              // 애정도 (0~5)
+      dragStart: { x: 0, y: 0 },
+      totalClicks: 0,       // 누적 클릭 수
+    };
+
+    // 감정별 메시지
+    const moodMessages = {
+      idle: ['안녕하세요!', '뭐하세요?', '...'],
+      happy: ['반갑습니다! 🤖', '커밋하셨나요?', '오늘도 화이팅!', '코드 = 글 ✨'],
+      excited: ['우와아아! 🔥', '신난다!', '멈출 수 없어!', '최고예요!!'],
+      love: ['좋아해요 💕', '더 놀아줘요!', '행복해요~', '고마워요 ❤️'],
+      sleepy: ['Zzz...', '졸려요...', '5분만...', '꿈나라...'],
+      surprised: ['헉!', '깜짝이야!', '우와!', '?!'],
+      rainbow: ['✨무적모드✨', '🌈레인보우!', '풀파워!!', 'MAX COMBO!'],
+    };
+
+    // 파티클 이모지
+    const particles = {
+      happy: ['✨', '⭐'],
+      excited: ['🔥', '💥', '⚡'],
+      love: ['❤️', '💕', '💗', '💖'],
+      surprised: ['❗', '⁉️', '💫'],
+      rainbow: ['🌟', '✨', '💎', '🎵', '🎶', '⭐'],
+      combo: ['💫', '⭐', '✨'],
+    };
+
+    // ===== 클릭 핸들러 =====
+    function mascotClick(e) {
+      e.stopPropagation();
+      const mascot = document.getElementById('about-mascot');
+
+      // 수면 상태면 깨우기
+      if (mascotState.isSleeping) {
+        wakeUp(mascot);
+        return;
+      }
+
+      // 콤보 카운트
+      mascotState.clickCount++;
+      mascotState.totalClicks++;
+
+      // 콤보 타이머 리셋 (800ms 내 재클릭)
+      clearTimeout(mascotState.comboTimer);
+      mascotState.comboTimer = setTimeout(() => {
+        mascotState.clickCount = 0;
+        hideCombo();
+      }, 1200);
+
+      // 콤보별 반응
+      const count = mascotState.clickCount;
+
+      if (count >= 10) {
+        // 10연타: 레인보우 모드
+        triggerRainbow(mascot);
+      } else if (count >= 5) {
+        // 5연타: 댄스
+        triggerDance(mascot);
+      } else if (count >= 3) {
+        // 3연타: 신남
+        triggerExcited(mascot);
+      } else {
+        // 일반 클릭: 점프 + 말풍선
+        triggerJump(mascot);
+      }
+
+      // 콤보 카운터 표시
+      if (count >= 2) showCombo(count);
+
+      // 파티클 생성
+      spawnParticles(e.clientX, e.clientY, count);
+
+      // 감정 업데이트
+      updateMood(count);
+    }
+
+    // ===== 더블클릭: 스핀 =====
+    function mascotDoubleClick(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const mascot = document.getElementById('about-mascot');
+
+      clearAnimations(mascot);
+      mascot.classList.add('spinning');
+      showBubble('우와! 빙글빙글~', 'surprised');
+      changeLED('#06B6D4');
+      spawnParticles(e.clientX, e.clientY, 3);
+
+      setTimeout(() => {
+        mascot.classList.remove('spinning');
+        mascot.classList.add('idle');
+      }, 600);
+    }
+
+    // ===== 롱프레스: 수면 모드 =====
+    function mascotMouseDown(e) {
+      e.stopPropagation();
+
+      // 드래그 준비
+      mascotState.dragStart = { x: e.clientX, y: e.clientY };
+
+      // 1.5초 이상 누르면 수면 모드
+      mascotState.longPressTimer = setTimeout(() => {
+        if (!mascotState.isDragging) {
+          fallAsleep();
+        }
+      }, 1500);
+    }
+
+    function mascotMouseUp(e) {
+      e.stopPropagation();
+      clearTimeout(mascotState.longPressTimer);
+
+      if (mascotState.isDragging) {
+        endDrag();
+      }
+    }
+
+    // ===== 드래그 시스템 =====
+    document.addEventListener('mousemove', (e) => {
+      if (mascotState.longPressTimer && !mascotState.isDragging) {
+        const dx = Math.abs(e.clientX - mascotState.dragStart.x);
+        const dy = Math.abs(e.clientY - mascotState.dragStart.y);
+        if (dx > 5 || dy > 5) {
+          clearTimeout(mascotState.longPressTimer);
+          startDrag(e);
+        }
+      }
+
+      if (mascotState.isDragging) {
+        moveDrag(e);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (mascotState.isDragging) endDrag();
+      clearTimeout(mascotState.longPressTimer);
+    });
+
+    function startDrag(e) {
+      mascotState.isDragging = true;
+      const mascot = document.getElementById('about-mascot');
+      const wrapper = document.getElementById('about-mascot-wrapper');
+
+      clearAnimations(mascot);
+      mascot.classList.add('dragging');
+      showBubble('이동 중~!', 'excited');
+    }
+
+    function moveDrag(e) {
+      const wrapper = document.getElementById('about-mascot-wrapper');
+      const parent = wrapper.parentElement;
+      const parentRect = parent.getBoundingClientRect();
+
+      const x = e.clientX - parentRect.left - 24;
+      const y = e.clientY - parentRect.top - 28;
+
+      wrapper.style.position = 'absolute';
+      wrapper.style.left = x + 'px';
+      wrapper.style.top = y + 'px';
+      wrapper.style.right = 'auto';
+      wrapper.style.bottom = 'auto';
+    }
+
+    function endDrag() {
+      mascotState.isDragging = false;
+      const mascot = document.getElementById('about-mascot');
+      mascot.classList.remove('dragging');
+      mascot.classList.add('idle');
+      showBubble('여기가 좋다!', 'happy');
+    }
+
+    // ===== 인터랙션 트리거들 =====
+
+    function triggerJump(mascot) {
+      clearAnimations(mascot);
+      mascot.classList.add('surprised');
+      const msg = randomMsg('happy');
+      showBubble(msg, 'happy');
+      changeLED('#00C471');
+
+      setTimeout(() => {
+        mascot.classList.remove('surprised');
+        mascot.classList.add('idle');
+      }, 500);
+    }
+
+    function triggerExcited(mascot) {
+      clearAnimations(mascot);
+      mascot.classList.add('dancing');
+      showBubble(randomMsg('excited'), 'excited');
+      changeLED('#FF6B35');
+
+      setTimeout(() => {
+        mascot.classList.remove('dancing');
+        mascot.classList.add('idle');
+      }, 600);
+    }
+
+    function triggerDance(mascot) {
+      clearAnimations(mascot);
+      mascot.classList.add('dancing');
+      showBubble(randomMsg('excited'), 'excited');
+      changeLED('#FF6B35');
+
+      // 팔 움직임 시뮬레이션
+      const armL = document.getElementById('arm-left');
+      const armR = document.getElementById('arm-right');
+      if (armL && armR) {
+        let tick = 0;
+        const armAnim = setInterval(() => {
+          tick++;
+          armL.setAttribute('y', 32 + (tick % 2 === 0 ? -3 : 0));
+          armR.setAttribute('y', 32 + (tick % 2 === 0 ? 0 : -3));
+          if (tick > 8) {
+            clearInterval(armAnim);
+            armL.setAttribute('y', 32);
+            armR.setAttribute('y', 32);
+          }
+        }, 150);
+      }
+
+      setTimeout(() => {
+        mascot.classList.remove('dancing');
+        mascot.classList.add('idle');
+      }, 1200);
+    }
+
+    function triggerRainbow(mascot) {
+      clearAnimations(mascot);
+      mascot.classList.add('rainbow');
+      showBubble(randomMsg('rainbow'), 'rainbow');
+
+      // 대량 파티클
+      const rect = mascot.getBoundingClientRect();
+      for (let i = 0; i < 12; i++) {
+        setTimeout(() => {
+          spawnParticles(
+            rect.left + Math.random() * rect.width,
+            rect.top + Math.random() * rect.height,
+            10
+          );
+        }, i * 100);
+      }
+
+      setTimeout(() => {
+        mascot.classList.remove('rainbow');
+        mascot.classList.add('idle');
+        changeLED('#00C471');
+      }, 3000);
+    }
+
+    function fallAsleep() {
+      const mascot = document.getElementById('about-mascot');
+      mascotState.isSleeping = true;
+
+      clearAnimations(mascot);
+      mascot.classList.add('sleeping');
+      showBubble(randomMsg('sleepy'), 'sleepy');
+      changeLED('#8B95A1');
+
+      // 눈 감기 (작은 선으로)
+      const eyeL = document.getElementById('eye-left');
+      const eyeR = document.getElementById('eye-right');
+      if (eyeL && eyeR) {
+        eyeL.setAttribute('height', '2');
+        eyeL.setAttribute('y', '16');
+        eyeR.setAttribute('height', '2');
+        eyeR.setAttribute('y', '16');
+      }
+
+      // Zzz 애니메이션
+      document.getElementById('zzz1').classList.add('active');
+      document.getElementById('zzz2').classList.add('active');
+      document.getElementById('zzz3').classList.add('active');
+    }
+
+    function wakeUp(mascot) {
+      mascotState.isSleeping = false;
+
+      clearAnimations(mascot);
+      mascot.classList.add('surprised');
+      showBubble('헉! 깼다!', 'surprised');
+      changeLED('#3182F6');
+
+      // 눈 복원
+      const eyeL = document.getElementById('eye-left');
+      const eyeR = document.getElementById('eye-right');
+      if (eyeL && eyeR) {
+        eyeL.setAttribute('height', '5');
+        eyeL.setAttribute('y', '14');
+        eyeR.setAttribute('height', '5');
+        eyeR.setAttribute('y', '14');
+      }
+
+      // Zzz 제거
+      document.getElementById('zzz1').classList.remove('active');
+      document.getElementById('zzz2').classList.remove('active');
+      document.getElementById('zzz3').classList.remove('active');
+
+      spawnParticles(
+        mascot.getBoundingClientRect().left + 24,
+        mascot.getBoundingClientRect().top,
+        3
+      );
+
+      setTimeout(() => {
+        mascot.classList.remove('surprised');
+        mascot.classList.add('idle');
+        changeLED('#00C471');
+      }, 500);
+    }
+
+    // ===== 유틸 함수들 =====
+
+    function clearAnimations(mascot) {
+      mascot.classList.remove('idle', 'walking', 'spinning', 'dancing', 'sleeping', 'surprised', 'rainbow', 'dragging');
+      mascot.style.transition = '';
+      mascot.style.transform = '';
+      mascot.style.filter = '';
+    }
+
+    function randomMsg(mood) {
+      const msgs = moodMessages[mood] || moodMessages.idle;
+      return msgs[Math.floor(Math.random() * msgs.length)];
+    }
+
+    function showBubble(text, mood) {
+      const bubble = document.getElementById('about-bubble');
+      bubble.textContent = text;
+      bubble.className = 'speech-bubble';
+      if (mood === 'rainbow') bubble.classList.add('rainbow-border');
+      else if (mood) bubble.classList.add(mood);
+      bubble.style.opacity = '1';
+
+      clearTimeout(showBubble._timer);
+      showBubble._timer = setTimeout(() => {
+        bubble.style.opacity = '0';
+      }, 2500);
+    }
+
+    function showCombo(count) {
+      const el = document.getElementById('about-combo');
+      let text = count + ' COMBO!';
+      if (count >= 10) text = '🌈 ' + count + ' COMBO! 🌈';
+      else if (count >= 5) text = '🔥 ' + count + ' COMBO!';
+      else if (count >= 3) text = '⚡ ' + count + ' COMBO!';
+
+      el.textContent = text;
+      el.className = 'combo-counter';
+      // 크기 스케일
+      el.style.fontSize = Math.min(0.875 + count * 0.05, 1.5) + 'rem';
+      // force reflow
+      void el.offsetWidth;
+      el.classList.add('show');
+    }
+
+    function hideCombo() {
+      const el = document.getElementById('about-combo');
+      el.style.opacity = '0';
+      el.className = 'combo-counter';
+    }
+
+    function changeLED(color) {
+      const led = document.getElementById('chest-led');
+      const ledInner = document.getElementById('chest-led-inner');
+      if (led) led.setAttribute('fill', color);
+      if (ledInner) ledInner.setAttribute('fill', color);
+    }
+
+    function updateMood(comboCount) {
+      const dots = document.querySelectorAll('#mood-bar .mood-dot');
+      // 에너지 증가
+      mascotState.energy = Math.min(5, mascotState.energy + 0.5);
+      // 애정도 증가
+      mascotState.love = Math.min(5, mascotState.love + 0.2);
+
+      // 기분 dot
+      dots[0].className = 'mood-dot active';
+      if (comboCount >= 5) dots[0].classList.add('excited');
+      else dots[0].classList.add('happy');
+
+      // 에너지 dot
+      dots[1].className = 'mood-dot';
+      if (mascotState.energy >= 3) {
+        dots[1].classList.add('active', 'excited');
+      }
+
+      // 애정 dot
+      dots[2].className = 'mood-dot';
+      if (mascotState.love >= 2) {
+        dots[2].classList.add('active', 'love');
+      }
+    }
+
+    // ===== 파티클 시스템 =====
+    function spawnParticles(x, y, intensity) {
+      const container = document.getElementById('about-particles');
+      if (!container) return;
+
+      const type = intensity >= 10 ? 'rainbow' :
+                   intensity >= 5 ? 'excited' :
+                   intensity >= 3 ? 'combo' : 'happy';
+      const emojis = particles[type];
+      const count = Math.min(intensity, 8);
+
+      const containerRect = container.closest('.mascot-wrapper').getBoundingClientRect();
+
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        if (intensity >= 3) {
+          // 폭발형 파티클
+          particle.className = 'particle-star';
+          const angle = (Math.PI * 2 / count) * i;
+          const dist = 30 + Math.random() * 40;
+          particle.style.setProperty('--px', Math.cos(angle) * dist + 'px');
+          particle.style.setProperty('--py', Math.sin(angle) * dist + 'px');
+          particle.style.left = '50%';
+          particle.style.top = '30%';
+        } else {
+          // 위로 떠오르는 파티클
+          particle.className = 'particle';
+          particle.style.left = (20 + Math.random() * 60) + '%';
+          particle.style.top = (10 + Math.random() * 30) + '%';
+        }
+
+        container.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+      }
+    }
+
+    // ===== 플레이그라운드 마스코트 이동 =====
+    function movePlaygroundMascot(e) {
+      const playground = document.getElementById('playground');
+      const mascot = document.getElementById('playground-mascot');
+      const rect = playground.getBoundingClientRect();
+      const targetX = e.clientX - rect.left;
+      const currentX = mascot.offsetLeft + mascot.offsetWidth / 2;
+
+      const mascotEl = mascot.querySelector('.mascot');
+      if (targetX < currentX) {
+        mascotEl.classList.add('flip');
+      } else {
+        mascotEl.classList.remove('flip');
+      }
+
+      mascotEl.classList.remove('idle');
+      mascotEl.classList.add('walking');
+
+      const clampedX = Math.max(32, Math.min(targetX, rect.width - 32));
+      mascot.style.left = clampedX + 'px';
+      mascot.style.transform = 'translateX(-50%)';
+      mascot.style.transition = 'left 0.8s ease-out';
+
+      setTimeout(() => {
+        mascotEl.classList.remove('walking');
+        mascotEl.classList.add('idle');
+      }, 900);
+    }
+
+    // ===== 404 페이지 마스코트 클릭 =====
+    document.addEventListener('DOMContentLoaded', () => {
+      const lostMascot = document.querySelector('.lost-mascot');
+      if (lostMascot) {
+        lostMascot.style.cursor = 'pointer';
+        lostMascot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // 클릭하면 잠시 멈추고 반응
+          lostMascot.style.animationPlayState = 'paused';
+
+          const question = lostMascot.querySelector('.lost-question');
+          if (question) question.textContent = '!';
+
+          setTimeout(() => {
+            if (question) question.textContent = '?';
+            lostMascot.style.animationPlayState = 'running';
+          }, 1500);
+        });
+      }
+    });
+
+    // ===== 히어로 마스코트 클릭 =====
+    const heroMessages = {
+      1: ['안녕하세요! 👋', '산책 중이에요~', '좋은 하루!', '코딩하러 가는 길!', '블로그 구경 중 🤖'],
+      2: ['...누구세요?', '저도 놀아주세요!', '보라봇이에요~', '따라오지 마세요...', '비밀 임무 중! 🔮'],
+    };
+    const heroClickCount = { 1: 0, 2: 0 };
+
+    function heroMascotClick(walker, e) {
+      e.stopPropagation();
+      const id = walker.id === 'hero-mascot-1' ? 1 : 2;
+      heroClickCount[id]++;
+      const count = heroClickCount[id];
+
+      // 멈추기
+      walker.classList.add('paused');
+      if (id === 2) walker.style.opacity = '1';
+
+      // 말풍선
+      const bubble = document.getElementById('hero-bubble-' + id);
+      const msgs = heroMessages[id];
+      bubble.textContent = msgs[(count - 1) % msgs.length];
+      bubble.classList.add('show');
+
+      // 파티클
+      const container = walker.querySelector('.hero-particle-container');
+      const emojis = id === 1 ? ['✨', '⭐', '💙'] : ['🔮', '💜', '✨'];
+      for (let i = 0; i < 3 + Math.min(count, 5); i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        p.style.left = (10 + Math.random() * 80) + '%';
+        p.style.top = (Math.random() * 40) + '%';
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+      }
+
+      // 5연타 → 스핀
+      if (count % 5 === 0) {
+        const mascotEl = walker.querySelector('.mascot');
+        mascotEl.classList.remove('walking');
+        mascotEl.classList.add('spinning');
+        bubble.textContent = id === 1 ? '신난다!! 🎉' : '우와앗! 💫';
+        for (let i = 0; i < 10; i++) {
+          setTimeout(() => {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.textContent = ['🌟','✨','💫','⭐','🎵'][Math.floor(Math.random()*5)];
+            p.style.left = (Math.random() * 100) + '%';
+            p.style.top = (Math.random() * 60) + '%';
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
+          }, i * 80);
+        }
+        setTimeout(() => {
+          mascotEl.classList.remove('spinning');
+          mascotEl.classList.add('walking');
+        }, 700);
+      }
+
+      // 3초 후 다시 걷기
+      clearTimeout(walker._resumeTimer);
+      walker._resumeTimer = setTimeout(() => {
+        walker.classList.remove('paused');
+        bubble.classList.remove('show');
+        if (id === 2) walker.style.opacity = '0.35';
+      }, 3000);
+    }
+
+    // ===== 키보드 인터랙션 (이스터에그) =====
+    const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let konamiIdx = 0;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === konamiCode[konamiIdx]) {
+        konamiIdx++;
+        if (konamiIdx === konamiCode.length) {
+          // 코나미 코드 달성!
+          konamiIdx = 0;
+          const mascot = document.getElementById('about-mascot');
+          if (mascot) {
+            triggerRainbow(mascot);
+            showBubble('코나미 코드!! 🎮', 'rainbow');
+          }
+        }
+      } else {
+        konamiIdx = 0;
+      }
+    });
+
+    // ===== 초기 다크모드 =====
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark');
+      document.getElementById('toggle-dark').checked = true;
+    }
+  </script>
+</body>
+</html>

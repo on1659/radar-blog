@@ -2,8 +2,13 @@
  * AI 생성 글 검수 모듈
  * - 마크다운 내 URL 유효성 검사
  * - 콘텐츠 품질 체크 (길이, 필수 필드, 구조)
- * - 검수 실패 시 published: false 로 전환
+ * - LLM 기반 할루시네이션 판별 (z.ai)
+ * - 검수 실패 시 hallucination 카테고리로 분류
  */
+
+import { checkHallucination, logHallucinationCheck, buildHallucinationBanner, type HallucinationResult } from "./hallucination-checker";
+
+export { type HallucinationResult, buildHallucinationBanner };
 
 /* ───── Types ───── */
 
@@ -20,6 +25,8 @@ export interface ValidationResult {
   score: number;
   issues: ValidationIssue[];
   linkResults: LinkCheckResult[];
+  /** LLM 할루시네이션 판별 결과 */
+  hallucination?: HallucinationResult;
 }
 
 interface ValidationIssue {
@@ -41,6 +48,10 @@ interface ValidateOptions {
   skipLinkCheck?: boolean;
   /** signal 카테고리 여부 (출처 필수 체크) */
   requireSources?: boolean;
+  /** LLM 할루시네이션 체크 활성화 */
+  checkHallucination?: boolean;
+  /** 할루시네이션 체크용 원본 소스 컨텍스트 */
+  sourceContext?: string;
 }
 
 /* ───── Markdown Link Extractor ───── */
@@ -211,6 +222,32 @@ export const validatePost = async (options: ValidateOptions): Promise<Validation
     }
   }
 
+  // LLM 할루시네이션 체크
+  let hallucinationResult: HallucinationResult | undefined;
+  if (options.checkHallucination) {
+    hallucinationResult = await checkHallucination({
+      content: options.content,
+      title: options.title,
+      sourceContext: options.sourceContext,
+    });
+    logHallucinationCheck("(pre-save)", hallucinationResult);
+
+    if (hallucinationResult.hallucinated) {
+      issues.push({
+        severity: "error",
+        code: "HALLUCINATION",
+        message: `할루시네이션 감지: ${hallucinationResult.summary}`,
+      });
+      for (const s of hallucinationResult.suspects.filter((s) => s.severity === "high")) {
+        issues.push({
+          severity: "error",
+          code: `HALLUCINATION_${s.type.toUpperCase()}`,
+          message: `${s.reason} — "${s.excerpt.slice(0, 80)}"`,
+        });
+      }
+    }
+  }
+
   // 점수 계산
   const errorCount = issues.filter((i) => i.severity === "error").length;
   const warningCount = issues.filter((i) => i.severity === "warning").length;
@@ -219,11 +256,16 @@ export const validatePost = async (options: ValidateOptions): Promise<Validation
   // error가 하나라도 있으면 실패
   const passed = errorCount === 0;
 
-  return { passed, score, issues, linkResults };
+  return { passed, score, issues, linkResults, hallucination: hallucinationResult };
 };
 
 /** 검수 실패 사유를 마크다운 배너로 생성 (본문 상단에 삽입용) */
 export const buildFailureBanner = (result: ValidationResult): string => {
+  // 할루시네이션 전용 배너가 있으면 우선 사용
+  if (result.hallucination?.hallucinated) {
+    return buildHallucinationBanner(result.hallucination);
+  }
+
   const lines = [
     `> **이 글은 AI 검수에서 통과하지 못했습니다** (점수: ${result.score}/100)`,
     ">",

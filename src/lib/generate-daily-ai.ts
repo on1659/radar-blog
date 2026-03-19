@@ -106,13 +106,15 @@ export const generateDailyAIPost = async (): Promise<{
   const excerpt = content.replace(/[#*`>\[\]]/g, "").slice(0, 200);
   const excerptEn = contentEn ? contentEn.replace(/[#*`>\[\]]/g, "").slice(0, 200) : null;
 
-  // 검수: URL 유효성 + 콘텐츠 품질 체크
+  // 검수: URL 유효성 + 콘텐츠 품질 + LLM 할루시네이션 판별
   const validation = await validatePost({
     content,
     title: parsed.title,
     minLength: 800,
     maxLength: 8000,
     requireSources: true,
+    checkHallucination: true,
+    sourceContext: newsContext,
   });
 
   // 검수 실패 → hallucination 카테고리 + 사유 배너 삽입, 통과 → signal

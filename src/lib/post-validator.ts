@@ -59,6 +59,32 @@ const extractLinks = (markdown: string): string[] => {
 
 /* ───── URL Validator ───── */
 
+/** 페이월/봇차단이 알려진 도메인 — 401/403은 정상으로 간주 */
+const PAYWALL_DOMAINS = [
+  "wsj.com", "nytimes.com", "ft.com", "bloomberg.com", "economist.com",
+  "washingtonpost.com", "theathletic.com", "thetimes.co.uk",
+  "medium.com", "substack.com",
+];
+
+/** 봇 차단이 잦은 뉴스 도메인 — 403은 정상으로 간주 */
+const BOT_BLOCKED_DOMAINS = [
+  "fox", "cnn.com", "bbc.com", "reuters.com", "apnews.com",
+  "theverge.com", "techcrunch.com", "arstechnica.com",
+];
+
+const isDomainExempt = (url: string, status: number): boolean => {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    // 401 (페이월) 허용
+    if (status === 401 && PAYWALL_DOMAINS.some((d) => hostname.includes(d))) return true;
+    // 403 (봇차단) 허용
+    if (status === 403 && [...PAYWALL_DOMAINS, ...BOT_BLOCKED_DOMAINS].some((d) => hostname.includes(d))) return true;
+    return false;
+  } catch {
+    return false;
+  }
+};
+
 const checkUrl = async (url: string): Promise<LinkCheckResult> => {
   try {
     const controller = new AbortController();
@@ -72,7 +98,7 @@ const checkUrl = async (url: string): Promise<LinkCheckResult> => {
     });
     clearTimeout(timeout);
 
-    // 403/405 = HEAD 차단하는 서버 → GET으로 재시도
+    // 403/405 = HEAD 차단하는 서버 → 브라우저 UA로 GET 재시도
     if (res.status === 403 || res.status === 405) {
       const controller2 = new AbortController();
       const timeout2 = setTimeout(() => controller2.abort(), 8000);
@@ -80,15 +106,20 @@ const checkUrl = async (url: string): Promise<LinkCheckResult> => {
         method: "GET",
         signal: controller2.signal,
         redirect: "follow",
-        headers: { "User-Agent": "EtherBlog-Validator/1.0" },
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; EtherBlog-Validator/1.0)" },
       });
       clearTimeout(timeout2);
-      // body 읽기 취소 (메모리 절약)
       await res2.body?.cancel();
       return { url, ok: res2.status < 400, status: res2.status };
     }
 
     await res.body?.cancel();
+
+    // 페이월/봇차단 도메인은 401/403도 정상 처리
+    if (!res.ok && isDomainExempt(url, res.status)) {
+      return { url, ok: true, status: res.status };
+    }
+
     return { url, ok: res.status < 400, status: res.status };
   } catch (err) {
     return {
@@ -189,6 +220,21 @@ export const validatePost = async (options: ValidateOptions): Promise<Validation
   const passed = errorCount === 0;
 
   return { passed, score, issues, linkResults };
+};
+
+/** 검수 실패 사유를 마크다운 배너로 생성 (본문 상단에 삽입용) */
+export const buildFailureBanner = (result: ValidationResult): string => {
+  const lines = [
+    `> **이 글은 AI 검수에서 통과하지 못했습니다** (점수: ${result.score}/100)`,
+    ">",
+  ];
+  for (const issue of result.issues) {
+    const icon = issue.severity === "error" ? "🚫" : "⚠️";
+    lines.push(`> ${icon} ${issue.message}`);
+  }
+  lines.push(">");
+  lines.push("> 링크 오류, 품질 미달 등의 사유로 자동 분류된 글입니다.");
+  return lines.join("\n") + "\n\n---\n\n";
 };
 
 /** 검수 결과 로그 출력 */

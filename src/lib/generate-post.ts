@@ -3,7 +3,7 @@ import { prisma } from "./prisma";
 import { getCommitDetail } from "./github";
 import { generateBlogContent } from "./claude";
 import { calculateReadingTime } from "./markdown";
-import { validatePost, logValidation } from "./post-validator";
+import { validatePost, logValidation, buildFailureBanner } from "./post-validator";
 
 const DAILY_POST_CAP = 10;
 
@@ -113,15 +113,17 @@ export const processCommits = async (
         skipLinkCheck: true,
       });
 
-      // 검수 실패 → hallucination 카테고리, 통과 → commits 카테고리
-      const shouldPublish = watchedRepo.autoPublish && validation.passed;
+      // 검수 실패 → hallucination 카테고리 + 사유 배너, 통과 → commits
+      const shouldPublish = validation.passed ? watchedRepo.autoPublish : true;
+      const finalContent = validation.passed ? content : buildFailureBanner(validation) + content;
+      const finalContentEn = validation.passed ? contentEn : (contentEn ? buildFailureBanner(validation) + contentEn : contentEn);
 
       const post = await prisma.post.create({
         data: {
           title,
           titleEn: titleEn || null,
-          content,
-          contentEn: contentEn || null,
+          content: finalContent,
+          contentEn: finalContentEn || null,
           excerpt,
           excerptEn,
           slug,

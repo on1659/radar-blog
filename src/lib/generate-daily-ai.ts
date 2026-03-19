@@ -5,7 +5,7 @@ import { calculateReadingTime } from "./markdown";
 import { fetchAINews } from "./fetch-ai-news";
 import { getAIConfig } from "./claude";
 import { getWritingStyle, buildSystemPrompt } from "@/config/writing-style";
-import { validatePost, logValidation } from "./post-validator";
+import { validatePost, logValidation, buildFailureBanner } from "./post-validator";
 import { type RawSignalItem, SLOT_CONFIG, TOTAL_SLOTS } from "./signal-sources";
 
 const SIGNAL_RESPONSE_FORMAT = `반드시 JSON으로 응답:
@@ -115,20 +115,23 @@ export const generateDailyAIPost = async (): Promise<{
     requireSources: true,
   });
 
-  // 검수 실패 → hallucination 카테고리, 통과 → signal 카테고리 + published
+  // 검수 실패 → hallucination 카테고리 + 사유 배너 삽입, 통과 → signal
+  const finalContent = validation.passed ? content : buildFailureBanner(validation) + content;
+  const finalContentEn = validation.passed ? contentEn : (contentEn ? buildFailureBanner(validation) + contentEn : contentEn);
+
   const post = await prisma.post.create({
     data: {
       title: parsed.title,
       titleEn: parsed.titleEn || null,
-      content,
-      contentEn,
+      content: finalContent,
+      contentEn: finalContentEn,
       excerpt,
       excerptEn,
       slug,
       category: validation.passed ? "signal" : "hallucination",
       tags: validation.passed ? (parsed.tags || ["AI", "Daily"]) : [...(parsed.tags || ["AI", "Daily"]), "검수실패"],
       readingTime,
-      published: validation.passed,
+      published: true,
       validationScore: validation.score,
       validationIssues: validation.issues.length > 0 ? JSON.stringify(validation.issues) : null,
       validatedAt: new Date(),

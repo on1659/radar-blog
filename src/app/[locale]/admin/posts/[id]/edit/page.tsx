@@ -134,14 +134,17 @@ const EditPostPage = () => {
       const reader = new FileReader();
       reader.onload = (ev) => {
         const text = ev.target?.result as string;
-        setContentKo(text);
+        if (activeLang === "en") {
+          setContentEn(text);
+        } else {
+          setContentKo(text);
+        }
         setContentType("html");
-        setActiveLang("ko");
       };
       reader.readAsText(file);
       e.target.value = "";
     },
-    []
+    [activeLang]
   );
 
   const handleDrop = useCallback(

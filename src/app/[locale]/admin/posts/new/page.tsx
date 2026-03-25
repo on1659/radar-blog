@@ -100,17 +100,19 @@ const NewPostPage = () => {
       const reader = new FileReader();
       reader.onload = (ev) => {
         const text = ev.target?.result as string;
-        setContentKo(text);
+        if (activeLang === "en") {
+          setContentEn(text);
+        } else {
+          setContentKo(text);
+        }
         setContentType("html");
-        setActiveLang("ko");
-        // HTML 파일명에서 제목 추출 시도
         const titleMatch = text.match(/<title>(.*?)<\/title>/i);
         if (titleMatch && !title) setTitle(titleMatch[1]);
       };
       reader.readAsText(file);
       e.target.value = "";
     },
-    [title]
+    [title, activeLang]
   );
 
   const handleDrop = useCallback(

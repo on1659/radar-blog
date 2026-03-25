@@ -164,12 +164,16 @@ const NewPostPage = () => {
     }
   };
 
-  const refreshPreview = useCallback(async (content: string) => {
+  const refreshPreview = useCallback(async (content: string, type: string) => {
+    if (type === "html") {
+      setPreviewHtml(content);
+      return;
+    }
     try {
       const res = await fetch("/api/admin/posts/preview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, contentType: type }),
       });
       const data = await res.json();
       if (data.success) setPreviewHtml(data.data);
@@ -183,10 +187,10 @@ const NewPostPage = () => {
     if (viewMode === "edit") return;
     if (previewTimer.current) clearTimeout(previewTimer.current);
     previewTimer.current = setTimeout(() => {
-      refreshPreview(activeContent);
+      refreshPreview(activeContent, contentType);
     }, 600);
     return () => { if (previewTimer.current) clearTimeout(previewTimer.current); };
-  }, [activeContent, viewMode, refreshPreview]);
+  }, [activeContent, viewMode, contentType, refreshPreview]);
 
   const handleSave = async () => {
     if (!title.trim() || !contentKo.trim()) {
@@ -447,11 +451,20 @@ const NewPostPage = () => {
         )}
         {/* Preview pane */}
         {viewMode !== "edit" && (
-          <div className={`overflow-y-auto p-6 ${viewMode === "split" ? "w-1/2" : "w-full"}`}>
-            <div
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: previewHtml }}
-            />
+          <div className={`overflow-y-auto ${contentType === "html" ? "" : "p-6"} ${viewMode === "split" ? "w-1/2" : "w-full"}`}>
+            {contentType === "html" ? (
+              <iframe
+                srcDoc={previewHtml}
+                sandbox="allow-scripts"
+                className="h-full min-h-[500px] w-full border-0"
+                title="HTML preview"
+              />
+            ) : (
+              <div
+                className="prose max-w-none p-6"
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
+            )}
           </div>
         )}
       </div>
@@ -460,7 +473,13 @@ const NewPostPage = () => {
       <div className="mt-4 flex items-center justify-between">
         <span className="text-meta text-text-muted">
           {activeContent.length > 0 &&
-            `${activeContent.length}자 · 약 ${Math.max(1, Math.ceil(activeContent.replace(/\s/g, "").length / 400))}분 읽기`}
+            (() => {
+              const text = contentType === "html"
+                ? activeContent.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim()
+                : activeContent;
+              const charCount = text.replace(/\s/g, "").length;
+              return `${charCount}자 · 약 ${Math.max(1, Math.ceil(charCount / 400))}분 읽기`;
+            })()}
           {contentKo && contentEn && (
             <span className="ml-2 text-cat-commits">KO + EN</span>
           )}

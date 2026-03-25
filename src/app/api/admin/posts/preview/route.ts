@@ -19,13 +19,18 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
-    const { content } = await req.json();
+    const { content, contentType } = await req.json();
 
     if (!content) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: "content is required" },
         { status: 400 }
       );
+    }
+
+    // HTML content: return as-is (render in iframe on client)
+    if (contentType === "html") {
+      return NextResponse.json<ApiResponse>({ success: true, data: content });
     }
 
     // Pre-process artifact blocks into iframes for preview

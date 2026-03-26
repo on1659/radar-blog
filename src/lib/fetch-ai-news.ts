@@ -248,6 +248,11 @@ const fetchRSSFeeds = async (): Promise<RawSignalItem[]> => {
       const url = item.link ?? "";
       if (!url) continue;
 
+      // RSS는 업보트 점수가 없으므로 최신성 기반 점수 부여
+      // 24h 이내 = 100, 48h = 50, 그 이상 = 10
+      const ageHours = (Date.now() - new Date(pubDate).getTime()) / (1000 * 60 * 60);
+      const recencyScore = ageHours <= 24 ? 100 : ageHours <= 48 ? 50 : 10;
+
       results.push({
         externalId: makeExternalId(`rss-${feed.name}`, url),
         canonicalUrl: extractCanonicalUrl(url, `RSS: ${feed.name}`),
@@ -255,7 +260,7 @@ const fetchRSSFeeds = async (): Promise<RawSignalItem[]> => {
         sourceType: "industry",
         title: item.title ?? "Untitled",
         url,
-        score: 0,
+        score: recencyScore,
         createdAt: pubDate,
         summary: item.contentSnippet?.slice(0, 500) || undefined,
       });

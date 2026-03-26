@@ -32,7 +32,7 @@ export const TOTAL_SLOTS = Object.values(SLOT_CONFIG).reduce((a, b) => a + b, 0)
 
 export const RSS_FEEDS = [
   // 기존
-  { name: "TLDR AI", url: "https://tldr.tech/ai/rss" },
+  { name: "TLDR", url: "https://tldr.tech/rss" },
   { name: "MIT Tech Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed" },
   // 신규 (P1)
   { name: "Google AI Blog", url: "http://googleaiblog.blogspot.com/atom.xml" },
@@ -40,7 +40,8 @@ export const RSS_FEEDS = [
   { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/" },
   // 공식 AI 기업 블로그
   { name: "Google DeepMind", url: "https://deepmind.google/blog/rss.xml" },
-  // Note: Anthropic(404), OpenAI(403) — RSS 미제공/차단으로 제외
+  { name: "OpenAI Blog", url: "https://openai.com/blog/rss.xml" },
+  // Note: Anthropic — RSS 미제공(404)으로 제외
 ];
 
 /* ───── AI 키워드 필터 ───── */

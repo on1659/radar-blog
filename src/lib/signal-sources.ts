@@ -35,13 +35,12 @@ export const RSS_FEEDS = [
   { name: "TLDR AI", url: "https://tldr.tech/ai/rss" },
   { name: "MIT Tech Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed" },
   // 신규 (P1)
-  { name: "OpenAI Blog", url: "https://openai.com/blog/rss/" },
   { name: "Google AI Blog", url: "http://googleaiblog.blogspot.com/atom.xml" },
   { name: "HuggingFace Blog", url: "https://huggingface.co/blog/feed.xml" },
   { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/" },
-  // 신규 (P1 - 공식 AI 기업 블로그)
-  { name: "Anthropic Blog", url: "https://www.anthropic.com/rss.xml" },
+  // 공식 AI 기업 블로그
   { name: "Google DeepMind", url: "https://deepmind.google/blog/rss.xml" },
+  // Note: Anthropic(404), OpenAI(403) — RSS 미제공/차단으로 제외
 ];
 
 /* ───── AI 키워드 필터 ───── */

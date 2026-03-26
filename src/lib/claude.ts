@@ -7,7 +7,7 @@ import { getWritingStyle, buildSystemPrompt, type WritingCategory } from "@/conf
 const PROVIDER_CONFIGS: Record<string, { baseURL: string; envKey: string; defaultModel: string }> = {
   anthropic: { baseURL: "https://api.anthropic.com/v1", envKey: "ANTHROPIC_API_KEY", defaultModel: "claude-sonnet-4-20250514" },
   openai:    { baseURL: "https://api.openai.com/v1", envKey: "OPENAI_API_KEY", defaultModel: "gpt-4o" },
-  google:    { baseURL: "https://generativelanguage.googleapis.com/v1beta/openai", envKey: "GOOGLE_AI_API_KEY", defaultModel: "gemini-2.5-flash" },
+  google:    { baseURL: "https://generativelanguage.googleapis.com/v1beta/openai", envKey: "GEMINI_API_KEY", defaultModel: "gemini-2.5-flash" },
   xai:       { baseURL: "https://api.x.ai/v1", envKey: "XAI_API_KEY", defaultModel: "grok-3" },
   zai:       { baseURL: "https://api.z.ai/api/coding/paas/v4", envKey: "Z_AI_API_KEY", defaultModel: "glm-5" },
   custom:    { baseURL: "", envKey: "AI_API_KEY", defaultModel: "claude-sonnet-4-20250514" },

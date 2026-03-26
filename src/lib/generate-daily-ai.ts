@@ -85,9 +85,26 @@ export const generateDailyAIPost = async (): Promise<{
   });
 
   const text = response.choices[0]?.message?.content ?? "";
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  let jsonMatch = text.match(/\{[\s\S]*\}/);
+
+  // JSON 파싱 실패 시 재시도: AI에게 텍스트를 JSON으로 변환 요청
   if (!jsonMatch) {
-    throw new Error("Failed to parse AI response as JSON");
+    console.warn(`AI response was not JSON (model=${model}, length=${text.length}). First 500 chars:`, text.slice(0, 500));
+    console.warn("Retrying with JSON conversion prompt...");
+    const retry = await client.chat.completions.create({
+      model,
+      max_tokens: 6000,
+      messages: [
+        { role: "system", content: "아래 텍스트를 JSON 형식으로 변환하라. 다른 설명 없이 JSON만 출력하라." },
+        { role: "user", content: `다음 글을 이 JSON 형식으로 변환해:\n${SIGNAL_RESPONSE_FORMAT}\n\n---\n\n${text}` },
+      ],
+    });
+    const retryText = retry.choices[0]?.message?.content ?? "";
+    jsonMatch = retryText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error(`Retry also failed (length=${retryText.length}). First 500 chars:`, retryText.slice(0, 500));
+      throw new Error("Failed to parse AI response as JSON after retry");
+    }
   }
 
   const parsed = JSON.parse(jsonMatch[0]);

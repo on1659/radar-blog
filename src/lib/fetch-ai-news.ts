@@ -206,7 +206,104 @@ const fetchGitHubTrending = async (): Promise<RawSignalItem[]> => {
   }
 };
 
-/* ───── 5. RSS Feeds ───── */
+/* ───── 5. Anthropic News (HTML 스크래핑) ───── */
+
+interface AnthropicArticle {
+  title: string;
+  slug: string;
+  summary?: string;
+  publishedOn: string;
+}
+
+/**
+ * Anthropic 뉴스 스크래퍼
+ * anthropic.com/news의 Next.js RSC payload에서 기사 추출
+ * 구조: "publishedOn":"ISO", "slug":{"_type":"slug","current":"xxx"}, "title":"xxx", "summary":"xxx"
+ */
+const fetchAnthropicNews = async (): Promise<RawSignalItem[]> => {
+  try {
+    const res = await fetch("https://www.anthropic.com/news", {
+      headers: { "User-Agent": "ai-trend-collector/1.0" },
+    });
+    if (!res.ok) {
+      console.error(`Anthropic News fetch failed: ${res.status}`);
+      return [];
+    }
+
+    const html = await res.text();
+
+    // RSC payload에서 JSON 데이터 추출 (이중 이스케이프 처리)
+    const scripts = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)];
+    const rawPayload = scripts.map((m) => m[1]).find((s) => s.length > 50000) ?? "";
+
+    if (!rawPayload) {
+      console.warn("Anthropic News: No large script payload found");
+      return [];
+    }
+
+    // 이중 이스케이프 제거: \\\" → ", \\\\ → (skip)
+    const payload = rawPayload.replace(/\\\\"/g, '"').replace(/\\"/g, '"');
+
+    // 기사 패턴: "publishedOn" + "slug"{"current":"xxx"} + "summary" + "title"
+    const articles: AnthropicArticle[] = [];
+    const seen = new Set<string>();
+
+    // publishedOn 위치를 기준으로 각 기사 청크 추출
+    const pubPattern = /"publishedOn":"(\d{4}-\d{2}-\d{2}T[^"]+)"/g;
+    let pubMatch;
+    while ((pubMatch = pubPattern.exec(payload)) !== null) {
+      const start = Math.max(0, pubMatch.index - 500);
+      const end = Math.min(payload.length, pubMatch.index + 500);
+      const chunk = payload.slice(start, end);
+
+      const slugM = chunk.match(/"slug":\{"_type":"slug","current":"([^"]+)"\}/);
+      const titleM = chunk.match(/"title":"([^"]{5,200})"/);
+      const summaryM = chunk.match(/"summary":"([^"]{0,500})"/);
+
+      if (slugM && titleM && !seen.has(slugM[1])) {
+        seen.add(slugM[1]);
+        articles.push({
+          publishedOn: pubMatch[1],
+          slug: slugM[1],
+          title: titleM[1],
+          summary: summaryM?.[1],
+        });
+      }
+    }
+
+    console.log(`[Anthropic News] Found ${articles.length} articles`);
+
+    // 30일 이내 기사 — 사소한 업데이트도 포함
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+
+    return articles
+      .filter((a) => new Date(a.publishedOn).getTime() >= cutoff)
+      .slice(0, MAX_ITEMS_PER_SOURCE)
+      .map((a) => {
+        const url = `https://www.anthropic.com/news/${a.slug}`;
+        const ageHours = (Date.now() - new Date(a.publishedOn).getTime()) / (1000 * 60 * 60);
+        // Anthropic 뉴스는 우선 수집 — 높은 기본 점수
+        const recencyScore = ageHours <= 24 ? 200 : ageHours <= 48 ? 150 : ageHours <= 168 ? 100 : 50;
+
+        return {
+          externalId: makeExternalId("anthropic-news", url),
+          canonicalUrl: extractCanonicalUrl(url, "Anthropic News"),
+          source: "Anthropic News",
+          sourceType: "industry" as SourceType,
+          title: a.title,
+          url,
+          score: recencyScore,
+          createdAt: a.publishedOn,
+          summary: a.summary?.slice(0, 500) || undefined,
+        };
+      });
+  } catch (e) {
+    console.error("Anthropic News fetch failed:", e);
+    return [];
+  }
+};
+
+/* ───── 6. RSS Feeds ───── */
 
 const fetchRSSFeeds = async (): Promise<RawSignalItem[]> => {
   const parser = new Parser({ timeout: 10000 });
@@ -327,18 +424,19 @@ const dedup = (items: RawSignalItem[]): RawSignalItem[] => {
 /* ───── 메인: 전체 소스 병렬 수집 ───── */
 
 export const fetchAINews = async (): Promise<RawSignalItem[]> => {
-  const [hn, reddit, hf, github, rss] = await Promise.all([
+  const [hn, reddit, hf, github, rss, anthropic] = await Promise.all([
     fetchHackerNews(),
     fetchReddit(),
     fetchHuggingFacePapers(),
     fetchGitHubTrending(),
     fetchRSSFeeds(),
+    fetchAnthropicNews(),
   ]);
 
-  const all = [...hn, ...reddit, ...hf, ...github, ...rss];
+  const all = [...hn, ...reddit, ...hf, ...github, ...rss, ...anthropic];
 
   console.log(
-    `[AI News] Collected: HN=${hn.length}, Reddit=${reddit.length}, HF=${hf.length}, GitHub=${github.length}, RSS=${rss.length}, Total=${all.length}`
+    `[AI News] Collected: HN=${hn.length}, Reddit=${reddit.length}, HF=${hf.length}, GitHub=${github.length}, RSS=${rss.length}, Anthropic=${anthropic.length}, Total=${all.length}`
   );
 
   // canonicalUrl 기반 cross-source dedup

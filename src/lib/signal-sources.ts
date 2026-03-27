@@ -41,7 +41,7 @@ export const RSS_FEEDS = [
   // 공식 AI 기업 블로그
   { name: "Google DeepMind", url: "https://deepmind.google/blog/rss.xml" },
   { name: "OpenAI Blog", url: "https://openai.com/blog/rss.xml" },
-  // Note: Anthropic — RSS 미제공(404)으로 제외
+  // Note: Anthropic — RSS 미제공, fetch-ai-news.ts에서 HTML 스크래핑으로 수집
 ];
 
 /* ───── AI 키워드 필터 ───── */

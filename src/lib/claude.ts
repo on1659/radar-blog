@@ -9,7 +9,7 @@ const PROVIDER_CONFIGS: Record<string, { baseURL: string; envKey: string; defaul
   openai:    { baseURL: "https://api.openai.com/v1", envKey: "OPENAI_API_KEY", defaultModel: "gpt-4o" },
   google:    { baseURL: "https://generativelanguage.googleapis.com/v1beta/openai", envKey: "GEMINI_API_KEY", defaultModel: "gemini-2.5-flash" },
   xai:       { baseURL: "https://api.x.ai/v1", envKey: "XAI_API_KEY", defaultModel: "grok-3" },
-  zai:       { baseURL: "https://api.z.ai/api/coding/paas/v4", envKey: "Z_AI_API_KEY", defaultModel: "glm-5" },
+  zai:       { baseURL: "https://api.z.ai/api/coding/paas/v4", envKey: "Z_AI_API_KEY", defaultModel: "glm-5.1" },
   custom:    { baseURL: "", envKey: "AI_API_KEY", defaultModel: "claude-sonnet-4-20250514" },
 };
 
@@ -114,6 +114,7 @@ export const generateBlogContent = async ({
   const response = await client.chat.completions.create({
     model,
     max_tokens: brief ? 2000 : 8000,
+    response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },
       {

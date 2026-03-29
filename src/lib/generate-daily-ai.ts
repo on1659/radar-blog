@@ -75,6 +75,7 @@ export const generateDailyAIPost = async (): Promise<{
   const response = await client.chat.completions.create({
     model,
     max_tokens: 6000,
+    response_format: { type: "json_object" },
     messages: [
       { role: "system", content: systemPrompt },
       {
@@ -94,6 +95,7 @@ export const generateDailyAIPost = async (): Promise<{
     const retry = await client.chat.completions.create({
       model,
       max_tokens: 6000,
+      response_format: { type: "json_object" },
       messages: [
         { role: "system", content: "아래 텍스트를 JSON 형식으로 변환하라. 다른 설명 없이 JSON만 출력하라." },
         { role: "user", content: `다음 글을 이 JSON 형식으로 변환해:\n${SIGNAL_RESPONSE_FORMAT}\n\n---\n\n${text}` },

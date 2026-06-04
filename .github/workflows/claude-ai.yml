@@ -1,9 +1,6 @@
 name: Claude AI Post
 
 on:
-  schedule:
-    # 매시간 실행 (UTC) — :15분에 실행 (daily-ai와 겹치지 않게)
-    - cron: '15 * * * *'
   workflow_dispatch:
 
 jobs:

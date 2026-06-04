@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { isAutoWritingEnabled } from "@/lib/auto-writing";
 import { parseWebhookPayload, processCommits } from "@/lib/generate-post";
 import type { ApiResponse } from "@/types";
 
@@ -41,6 +42,19 @@ export const POST = async (req: NextRequest) => {
 
     const data = JSON.parse(payload);
     const { commits, repository, branch } = parseWebhookPayload(data);
+
+    if (!isAutoWritingEnabled()) {
+      const res: ApiResponse = {
+        success: true,
+        data: {
+          message: "Automatic writing is disabled; push event ignored",
+          commits: commits.length,
+          repository: repository.full_name,
+          branch,
+        },
+      };
+      return NextResponse.json(res, { status: 200 });
+    }
 
     // 비동기 처리 — 즉시 202 Accepted 반환
     // Edge Runtime이 아닌 Node.js에서는 waitUntil 대신 fire-and-forget

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateApiKey } from "@/lib/api-auth";
+import { isAutoWritingEnabled } from "@/lib/auto-writing";
 import { generateClaudePost } from "@/lib/generate-daily-ai";
 import type { ApiResponse } from "@/types";
 
@@ -8,6 +9,14 @@ export const maxDuration = 300;
 export const POST = async (req: NextRequest) => {
   const authResult = await authenticateApiKey(req);
   if (!authResult.authenticated) return authResult.response!;
+
+  if (!isAutoWritingEnabled()) {
+    const body: ApiResponse = {
+      success: true,
+      data: { skipped: true, reason: "Automatic writing is disabled" },
+    };
+    return NextResponse.json(body);
+  }
 
   try {
     const result = await generateClaudePost();

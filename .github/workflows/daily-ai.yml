@@ -1,9 +1,6 @@
 name: Daily AI Post
 
 on:
-  schedule:
-    # 30분마다 실행 (UTC)
-    - cron: '*/30 * * * *'
   workflow_dispatch: # 수동 실행 가능
 
 jobs:

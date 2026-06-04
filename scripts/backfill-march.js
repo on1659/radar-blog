@@ -5,9 +5,38 @@ const OpenAI = require("openai").default;
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const prisma = new PrismaClient();
+const PROVIDER_CONFIGS = {
+  anthropic: {
+    baseURL: "https://api.anthropic.com/v1",
+    envKey: "ANTHROPIC_API_KEY",
+    defaultModel: "claude-sonnet-4-20250514",
+  },
+  openai: {
+    baseURL: "https://api.openai.com/v1",
+    envKey: "OPENAI_API_KEY",
+    defaultModel: "gpt-4o",
+  },
+  google: {
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
+    envKey: "GEMINI_API_KEY",
+    defaultModel: "gemini-2.5-flash",
+  },
+  xai: {
+    baseURL: "https://api.x.ai/v1",
+    envKey: "XAI_API_KEY",
+    defaultModel: "grok-3",
+  },
+};
+const selectedProvider = process.env.BACKFILL_AI_PROVIDER || "anthropic";
+const provider = PROVIDER_CONFIGS[selectedProvider] || PROVIDER_CONFIGS.anthropic;
+const aiApiKey = process.env.AI_API_KEY || process.env[provider.envKey];
+if (!aiApiKey) {
+  throw new Error(`AI API key not configured. Set AI_API_KEY or ${provider.envKey}.`);
+}
+const aiModel = process.env.AI_MODEL || provider.defaultModel;
 const ai = new OpenAI({
-  apiKey: process.env.Z_AI_API_KEY,
-  baseURL: "https://api.z.ai/api/coding/paas/v4",
+  apiKey: aiApiKey,
+  baseURL: process.env.AI_BASE_URL || provider.baseURL,
 });
 
 const SINCE = "2026-03-01T00:00:00Z";
@@ -105,9 +134,8 @@ async function main() {
         const totalAdd = files.reduce((s, f) => s + (f.additions || 0), 0);
         const totalDel = files.reduce((s, f) => s + (f.deletions || 0), 0);
 
-        // Call z.ai
         const response = await ai.chat.completions.create({
-          model: "glm-5",
+          model: aiModel,
           max_tokens: 2000,
           messages: [
             { role: "system", content: BRIEF_PROMPT },

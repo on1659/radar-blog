@@ -9,9 +9,10 @@ const PROVIDER_CONFIGS: Record<string, { baseURL: string; envKey: string; defaul
   openai:    { baseURL: "https://api.openai.com/v1", envKey: "OPENAI_API_KEY", defaultModel: "gpt-4o" },
   google:    { baseURL: "https://generativelanguage.googleapis.com/v1beta/openai", envKey: "GEMINI_API_KEY", defaultModel: "gemini-2.5-flash" },
   xai:       { baseURL: "https://api.x.ai/v1", envKey: "XAI_API_KEY", defaultModel: "grok-3" },
-  zai:       { baseURL: "https://api.z.ai/api/coding/paas/v4", envKey: "Z_AI_API_KEY", defaultModel: "glm-5.1" },
   custom:    { baseURL: "", envKey: "AI_API_KEY", defaultModel: "claude-sonnet-4-20250514" },
 };
+
+const DEFAULT_PROVIDER = "anthropic";
 
 export const getAIConfig = async (): Promise<{ baseURL: string; apiKey: string; model: string }> => {
   // Fast path: generic env vars override everything
@@ -28,8 +29,9 @@ export const getAIConfig = async (): Promise<{ baseURL: string; apiKey: string; 
     where: { key: { in: ["ai_provider", "ai_model"] } },
   });
   const settingsMap = Object.fromEntries(settings.map((s) => [s.key, s.value]));
-  const provider = settingsMap["ai_provider"] ?? "zai";
-  const config = PROVIDER_CONFIGS[provider] ?? PROVIDER_CONFIGS["zai"];
+  const configuredProvider = settingsMap["ai_provider"] ?? DEFAULT_PROVIDER;
+  const provider = PROVIDER_CONFIGS[configuredProvider] ? configuredProvider : DEFAULT_PROVIDER;
+  const config = PROVIDER_CONFIGS[provider];
 
   const apiKey = process.env.AI_API_KEY ?? process.env[config.envKey] ?? "";
   if (!apiKey) {
@@ -41,7 +43,7 @@ export const getAIConfig = async (): Promise<{ baseURL: string; apiKey: string; 
   return {
     baseURL: process.env.AI_BASE_URL ?? config.baseURL,
     apiKey,
-    model: process.env.AI_MODEL ?? settingsMap["ai_model"] ?? config.defaultModel,
+    model: process.env.AI_MODEL ?? (provider === configuredProvider ? settingsMap["ai_model"] : undefined) ?? config.defaultModel,
   };
 };
 

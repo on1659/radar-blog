@@ -89,11 +89,6 @@ const AI_MODELS: Record<string, { label: string; value: string }[]> = {
     { label: "Grok 3", value: "grok-3" },
     { label: "Grok 3 Mini", value: "grok-3-mini" },
   ],
-  zai: [
-    { label: "GLM-5", value: "glm-5" },
-    { label: "GLM-4", value: "glm-4" },
-    { label: "GLM-4 Plus", value: "glm-4-plus" },
-  ],
   custom: [
     { label: "Claude Sonnet 4", value: "claude-sonnet-4-20250514" },
     { label: "Claude Haiku 4.5", value: "claude-haiku-4-5-20251001" },
@@ -101,6 +96,11 @@ const AI_MODELS: Record<string, { label: string; value: string }[]> = {
     { label: "GPT-4o", value: "gpt-4o" },
   ],
 };
+
+const DEFAULT_AI_PROVIDER = "anthropic";
+
+const normalizeAiProvider = (provider?: string) =>
+  provider && AI_MODELS[provider] ? provider : DEFAULT_AI_PROVIDER;
 
 /* ───── Collapsible Section ───── */
 
@@ -186,6 +186,12 @@ const AdminSettingsPage = () => {
     typeof window !== "undefined"
       ? `${window.location.origin}/api/webhooks/github`
       : "/api/webhooks/github";
+  const selectedAiProviderId = normalizeAiProvider(settings["ai_provider"]);
+  const selectedAiModels = AI_MODELS[selectedAiProviderId];
+  const selectedAiModel =
+    selectedAiModels.some((model) => model.value === settings["ai_model"])
+      ? settings["ai_model"]
+      : selectedAiModels[0]?.value || "";
 
   /* ───── Fetch ───── */
 
@@ -765,7 +771,7 @@ const AdminSettingsPage = () => {
             </label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {aiProviders.map((provider) => {
-                const selected = (settings["ai_provider"] ?? "anthropic") === provider.id;
+                const selected = selectedAiProviderId === provider.id;
                 return (
                   <button
                     key={provider.id}
@@ -803,7 +809,7 @@ const AdminSettingsPage = () => {
             </div>
             {(() => {
               const selectedProvider = aiProviders.find(
-                (p) => p.id === (settings["ai_provider"] ?? "anthropic"),
+                (p) => p.id === selectedAiProviderId,
               );
               if (selectedProvider?.id === "custom") {
                 return (
@@ -833,14 +839,11 @@ const AdminSettingsPage = () => {
               모델
             </label>
             <select
-              value={
-                settings["ai_model"] ??
-                (AI_MODELS[settings["ai_provider"] ?? "anthropic"]?.[0]?.value || "")
-              }
+              value={selectedAiModel}
               onChange={(e) => updateSetting("ai_model", e.target.value)}
               className="w-full rounded-lg border border-border bg-bg-primary px-3 py-2 text-card-desc outline-none focus:border-brand-primary"
             >
-              {(AI_MODELS[settings["ai_provider"] ?? "anthropic"] ?? []).map((model) => (
+              {selectedAiModels.map((model) => (
                 <option key={model.value} value={model.value}>
                   {model.label}
                 </option>

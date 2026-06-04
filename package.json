@@ -7,6 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "auto:daily": "node scripts/local-auto-writer.js daily-ai",
+    "auto:claude": "node scripts/local-auto-writer.js claude-ai",
+    "auto:install": "node scripts/install-local-auto-writer.js install",
+    "auto:uninstall": "node scripts/install-local-auto-writer.js uninstall",
+    "auto:status": "node scripts/install-local-auto-writer.js status",
     "postinstall": "prisma generate"
   },
   "dependencies": {

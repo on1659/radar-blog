@@ -1,13 +1,20 @@
 #!/usr/bin/env node
-// Minimal OpenAI-compatible shim backed by the local `claude` CLI.
+// Minimal OpenAI-compatible shim backed by a local AI CLI (Codex or Claude).
 // radar-blog's AI client (OpenAI SDK) points AI_BASE_URL here; this translates
-// chat.completions requests into `claude -p` invocations — no cloud API key,
-// uses the local Claude Code subscription. Same pattern as ThreadsBot.
+// chat.completions requests into local CLI invocations — no cloud API key,
+// uses the local ChatGPT/Codex (default) or Claude subscription.
+// Backend via SHIM_BACKEND=codex|claude. Same pattern as ThreadsBot.
 import http from "node:http";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { execFile } from "node:child_process";
 
 const PORT = Number(process.env.CLAUDE_SHIM_PORT || 8787);
+const BACKEND = (process.env.SHIM_BACKEND || "codex").toLowerCase();
 const CLAUDE_BIN = process.env.CLAUDE_BIN || "claude";
+const CODEX_BIN = process.env.CODEX_BIN || "/Applications/Codex.app/Contents/Resources/codex";
+const CODEX_MODEL = process.env.CODEX_MODEL || ""; // empty → codex default model
 const TIMEOUT_MS = Number(process.env.CLAUDE_SHIM_TIMEOUT_MS || 240_000);
 
 // Map whatever model id radar-blog sends → a CLI alias the `claude` binary accepts.
@@ -99,6 +106,33 @@ const runClaude = (model, prompt) =>
     child.on("error", reject);
   });
 
+// Codex backend: `codex exec` non-interactively, capturing the final agent
+// message via --output-last-message. read-only sandbox = pure text generation.
+// Codex is agentic — without constraints it web-searches/uses MCP tools to
+// "research" the topic (158s/134k tokens). The guard + disabled MCP make it a
+// fast, deterministic single-shot completion (~22s) over the provided input.
+const CODEX_GUARD =
+  "\n\n[실행 제약] 웹 검색·MCP·node_repl·파일/네트워크 접근 등 어떤 도구도 사용하지 마라. " +
+  "외부 조사 없이 위에 주어진 정보만으로 즉시 최종 답변만 작성하라.";
+const runCodex = (prompt) =>
+  new Promise((resolve, reject) => {
+    const outFile = path.join(os.tmpdir(), `codex-shim-${Date.now()}-${Math.floor(Math.random() * 1e6)}.txt`);
+    const args = ["exec", "-s", "read-only", "--skip-git-repo-check", "--color", "never", "-c", "mcp_servers={}", "--output-last-message", outFile];
+    if (CODEX_MODEL) args.push("-m", CODEX_MODEL);
+    args.push(prompt + CODEX_GUARD);
+    execFile(CODEX_BIN, args, { maxBuffer: 64 * 1024 * 1024, timeout: TIMEOUT_MS }, (err, _stdout, stderr) => {
+      let text = "";
+      try { text = fs.readFileSync(outFile, "utf8"); } catch { /* no output */ }
+      try { fs.unlinkSync(outFile); } catch { /* ignore */ }
+      if (!text.trim()) {
+        return reject(new Error(`codex exec produced no output${err ? `: ${err.message}` : ""} ${String(stderr || "").slice(0, 500)}`));
+      }
+      resolve(text.trim());
+    });
+  });
+
+const runBackend = (model, prompt) => (BACKEND === "claude" ? runClaude(model, prompt) : runCodex(prompt));
+
 // Flatten OpenAI chat messages into a single, well-contextualized prompt.
 // System content is presented as authoritative role/instructions so the CLI
 // treats it as a legitimate task (avoids prompt-injection refusals).
@@ -138,7 +172,7 @@ const server = http.createServer((req, res) => {
         const payload = JSON.parse(raw || "{}");
         const jsonMode = payload.response_format?.type === "json_object";
         const prompt = buildPrompt(payload.messages) + (jsonMode ? JSON_MODE_INSTRUCTION : "");
-        const rawContent = await runClaude(payload.model, prompt);
+        const rawContent = await runBackend(payload.model, prompt);
 
         let content = rawContent;
         if (jsonMode) {
@@ -150,7 +184,7 @@ const server = http.createServer((req, res) => {
               "아래는 깨진 JSON이다. 이것을 유효한 JSON 객체 하나로만 변환하라. " +
               '모든 문자열 값 내부의 큰따옴표는 \\", 줄바꿈은 \\n 으로 이스케이프하고, ' +
               "코드펜스나 설명 없이 minified JSON만 출력하라.\n\n" + broken;
-            const repaired = await runClaude(payload.model, repairPrompt);
+            const repaired = await runBackend(payload.model, repairPrompt);
             const repairedJson = coerceJson(repaired);
             if (isValidJson(repairedJson)) content = repairedJson;
           }
@@ -180,5 +214,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`[claude-shim] listening on http://127.0.0.1:${PORT} (model alias via --model, backend=${CLAUDE_BIN})`);
+  const backendBin = BACKEND === "claude" ? CLAUDE_BIN : CODEX_BIN;
+  console.log(`[ai-shim] listening on http://127.0.0.1:${PORT} (backend=${BACKEND}, bin=${backendBin})`);
 });

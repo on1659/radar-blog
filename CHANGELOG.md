@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-06-15 (2) — AI 백엔드 Codex로 전환
+
+사용자 요청 "글 올릴 때는 코덱스 자원 쓰자" → shim 백엔드를 `claude -p`에서 **Codex**로 전환.
+
+- shim에 `SHIM_BACKEND` env 추가 (기본 `codex`, `claude` fallback). plist에 `SHIM_BACKEND=codex` + `CODEX_BIN` 설정.
+- Codex CLI = `/Applications/Codex.app/Contents/Resources/codex`(데스크톱 앱 번들 CLI, ChatGPT 로그인 인증). PATH엔 없고 앱 번들 안에만 존재.
+- `codex exec --output-last-message`로 최종 메시지 캡처. Codex는 에이전트라 뉴스 프롬프트에 웹검색/MCP(node_repl) 리서치 수행 → 158초/134k 토큰. **shim이 `-c mcp_servers={}` + "도구 금지·주어진 정보로 즉시 작성" 가드 주입**으로 ~21초로 억제. JSON 품질은 claude보다 깔끔.
+- 검증: codex 직접 호출 + shim 경유 모두 유효 JSON 생성 확인 (21초, 양질 한국어 본문). 글 생성 경로는 post 1496과 동일.
+- 라이브 풀파이프라인 codex 포스트는 당시 중복가드(daily-ai 뉴스 소진 / claude-ai 2h 이내)로 대기 — 다음 적격 스케줄에 자동 생성.
+
 ## 2026-06-15 — AI Signal 자동 발행 복구 (로컬 claude-CLI 워커 전환)
 
 ### 문제

@@ -12,7 +12,16 @@
       "WebSearch(*)",
       "Skill(*)",
       "NotebookEdit(*)",
-      "TodoWrite(*)"
+      "TodoWrite(*)",
+      "Bash(npm run *)",
+      "Bash(npm run auto:install)",
+      "Bash(npm run auto:status)",
+      "Bash(npm run auto:daily)",
+      "Bash(npm run auto:claude)",
+      "Bash(railway run *)",
+      "Bash(railway variables *)",
+      "Bash(railway status)",
+      "Read(//Users/radar/Library/LaunchAgents/**)"
     ]
   }
 }

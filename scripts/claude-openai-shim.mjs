@@ -117,18 +117,28 @@ const CODEX_GUARD =
 const runCodex = (prompt) =>
   new Promise((resolve, reject) => {
     const outFile = path.join(os.tmpdir(), `codex-shim-${Date.now()}-${Math.floor(Math.random() * 1e6)}.txt`);
-    const args = ["exec", "-s", "read-only", "--skip-git-repo-check", "--color", "never", "-c", "mcp_servers={}", "--output-last-message", outFile];
+    const args = ["exec", "-s", "read-only", "--skip-git-repo-check", "--color", "never", "-c", "mcp_servers={}", "-c", "tools.web_search=false", "--output-last-message", outFile];
     if (CODEX_MODEL) args.push("-m", CODEX_MODEL);
     args.push(prompt + CODEX_GUARD);
-    execFile(CODEX_BIN, args, { maxBuffer: 64 * 1024 * 1024, timeout: TIMEOUT_MS }, (err, _stdout, stderr) => {
+    const child = execFile(CODEX_BIN, args, { maxBuffer: 64 * 1024 * 1024, timeout: TIMEOUT_MS }, (err, stdout, stderr) => {
       let text = "";
       try { text = fs.readFileSync(outFile, "utf8"); } catch { /* no output */ }
       try { fs.unlinkSync(outFile); } catch { /* ignore */ }
       if (!text.trim()) {
-        return reject(new Error(`codex exec produced no output${err ? `: ${err.message}` : ""} ${String(stderr || "").slice(0, 500)}`));
+        console.error("[codex fail]", JSON.stringify({
+          killed: err?.killed, signal: err?.signal, code: err?.code,
+          msg: String(err?.message || "").slice(0, 160),
+          stderrTail: String(stderr || "").slice(-800),
+          stdoutTail: String(stdout || "").slice(-800),
+          promptLen: prompt.length,
+        }));
+        return reject(new Error(`codex exec produced no output${err ? `: ${err.message}` : ""} ${String(stderr || "").slice(0, 300)}`));
       }
       resolve(text.trim());
     });
+    // codex exec reads stdin when it's a pipe (non-TTY, as under execFile);
+    // close it immediately so codex doesn't block "Reading additional input from stdin".
+    child.stdin?.end();
   });
 
 const runBackend = (model, prompt) => (BACKEND === "claude" ? runClaude(model, prompt) : runCodex(prompt));

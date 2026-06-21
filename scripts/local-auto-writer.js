@@ -72,6 +72,48 @@ const postJson = async (url, apiKey) => {
   }
 };
 
+const escapeHtml = (s) =>
+  String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// Fetch the created post (title/slug) via the external posts API.
+const fetchPost = async (baseUrl, apiKey, postId) => {
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/posts/${postId}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body && typeof body === "object" ? body.data : null;
+  } catch {
+    return null;
+  }
+};
+
+// Notify Telegram when a post is published. No-op if TELEGRAM_* not configured.
+const notifyTelegram = async (publicUrl, post, postId) => {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const title = post?.title || "새 글";
+  const link = post?.slug ? `${publicUrl}/post/${post.slug}` : `${publicUrl}/signal`;
+  const tag = post?.category === "hallucination" ? "⚠️ 검수 실패 글" : "📝 새 글 발행";
+  const text = `${tag}\n<b>${escapeHtml(title)}</b>\n${link}`;
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+    });
+    const d = await res.json();
+    if (!d.ok) log(`Telegram failed: ${d.description}`);
+    else log(`Telegram notified: ${title}`);
+  } catch (e) {
+    log(`Telegram error: ${e.message}`);
+  }
+};
+
 const run = async () => {
   const job = process.argv[2];
   if (!JOBS[job]) {
@@ -107,6 +149,9 @@ const run = async () => {
 
   if (data?.postId) {
     log(`${job} created post: ${data.postId}`);
+    const publicUrl = (process.env.BLOG_PUBLIC_URL || "https://radarlog.kr").replace(/\/$/, "");
+    const post = await fetchPost(baseUrl, apiKey, data.postId);
+    await notifyTelegram(publicUrl, post, data.postId);
     return;
   }
 

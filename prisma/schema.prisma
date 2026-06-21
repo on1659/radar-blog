@@ -147,6 +147,20 @@ model SignalItem {
   @@index([usedInPost])
 }
 
+// 자동 발행 트리거 1회 = 1행. 발행/스킵/실패와 사유를 기록해 모니터링 페이지에서 노출.
+model PublishRun {
+  id         String   @id @default(cuid())
+  job        String   // "daily-ai" | "claude-ai"
+  status     String   // "posted" | "skipped" | "failed"
+  reason     String?  // 스킵 사유 또는 에러 메시지
+  postId     String?  // status="posted"일 때 생성된 글 id
+  durationMs Int?     // 트리거 처리 시간(ms)
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([job])
+}
+
 enum Category {
   commits
   articles

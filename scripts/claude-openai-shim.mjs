@@ -114,13 +114,20 @@ const runClaude = (model, prompt) =>
 const CODEX_GUARD =
   "\n\n[실행 제약] 웹 검색·MCP·node_repl·파일/네트워크 접근 등 어떤 도구도 사용하지 마라. " +
   "외부 조사 없이 위에 주어진 정보만으로 즉시 최종 답변만 작성하라.";
-const runCodex = (prompt) =>
+// One codex attempt. reasoning_effort=low overrides the user's global xhigh
+// (xhigh makes blog summaries slow enough to hit the timeout). Short per-attempt
+// timeout so a hung run (e.g. codex's intermittent "refresh available models"
+// child-process hang) fails fast and the retry can still fit the scheduler window.
+const CODEX_ATTEMPT_MS = Number(process.env.CODEX_ATTEMPT_TIMEOUT_MS || 110_000);
+const runCodexOnce = (prompt) =>
   new Promise((resolve, reject) => {
     const outFile = path.join(os.tmpdir(), `codex-shim-${Date.now()}-${Math.floor(Math.random() * 1e6)}.txt`);
-    const args = ["exec", "-s", "read-only", "--skip-git-repo-check", "--color", "never", "-c", "mcp_servers={}", "-c", "tools.web_search=false", "--output-last-message", outFile];
+    const args = ["exec", "-s", "read-only", "--skip-git-repo-check", "--color", "never",
+      "-c", "mcp_servers={}", "-c", "tools.web_search=false", "-c", "model_reasoning_effort=low",
+      "--output-last-message", outFile];
     if (CODEX_MODEL) args.push("-m", CODEX_MODEL);
     args.push(prompt + CODEX_GUARD);
-    const child = execFile(CODEX_BIN, args, { maxBuffer: 64 * 1024 * 1024, timeout: TIMEOUT_MS }, (err, stdout, stderr) => {
+    const child = execFile(CODEX_BIN, args, { maxBuffer: 64 * 1024 * 1024, timeout: CODEX_ATTEMPT_MS }, (err, stdout, stderr) => {
       let text = "";
       try { text = fs.readFileSync(outFile, "utf8"); } catch { /* no output */ }
       try { fs.unlinkSync(outFile); } catch { /* ignore */ }
@@ -128,11 +135,10 @@ const runCodex = (prompt) =>
         console.error("[codex fail]", JSON.stringify({
           killed: err?.killed, signal: err?.signal, code: err?.code,
           msg: String(err?.message || "").slice(0, 160),
-          stderrTail: String(stderr || "").slice(-800),
-          stdoutTail: String(stdout || "").slice(-800),
+          stderrTail: String(stderr || "").slice(-500),
           promptLen: prompt.length,
         }));
-        return reject(new Error(`codex exec produced no output${err ? `: ${err.message}` : ""} ${String(stderr || "").slice(0, 300)}`));
+        return reject(new Error(`codex exec produced no output${err ? `: ${err.message}` : ""}`));
       }
       resolve(text.trim());
     });
@@ -140,6 +146,16 @@ const runCodex = (prompt) =>
     // close it immediately so codex doesn't block "Reading additional input from stdin".
     child.stdin?.end();
   });
+
+// Retry once: codex's model-refresh child-process hang is intermittent.
+const runCodex = async (prompt) => {
+  let lastErr;
+  for (let i = 0; i < 2; i++) {
+    try { return await runCodexOnce(prompt); }
+    catch (e) { lastErr = e; console.error(`[codex] attempt ${i + 1} failed${i < 1 ? ", retrying" : ""}`); }
+  }
+  throw lastErr;
+};
 
 const runBackend = (model, prompt) => (BACKEND === "claude" ? runClaude(model, prompt) : runCodex(prompt));
 

@@ -135,27 +135,40 @@ const run = async () => {
     return;
   }
 
-  const { response, body } = await postJson(url, apiKey);
-  const data = body && typeof body === "object" ? body.data : undefined;
+  const maxAttempts = Number(process.env.AUTO_WRITER_MAX_ATTEMPTS || 3);
+  const retryDelayMs = Number(process.env.AUTO_WRITER_RETRY_DELAY_MS || 5000);
 
-  if (!response.ok) {
-    throw new Error(`${job} failed with HTTP ${response.status}: ${JSON.stringify(body)}`);
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const { response, body } = await postJson(url, apiKey);
+      const data = body && typeof body === "object" ? body.data : undefined;
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${JSON.stringify(body)}`);
+      }
+
+      // skip = deliberate gate (no fresh items / cooldown), NOT a failure → don't retry
+      if (data?.skipped) {
+        log(`${job} skipped: ${data.reason || "no reason provided"}`);
+        return;
+      }
+
+      if (data?.postId) {
+        log(`${job} created post: ${data.postId} (attempt ${attempt}/${maxAttempts})`);
+        const publicUrl = (process.env.BLOG_PUBLIC_URL || "https://radarlog.kr").replace(/\/$/, "");
+        const post = await fetchPost(baseUrl, apiKey, data.postId);
+        await notifyTelegram(publicUrl, post, data.postId);
+        return;
+      }
+
+      log(`${job} completed: ${JSON.stringify(body)}`);
+      return;
+    } catch (err) {
+      log(`${job} attempt ${attempt}/${maxAttempts} failed: ${err.message}`);
+      if (attempt >= maxAttempts) throw err;
+      await new Promise((r) => setTimeout(r, retryDelayMs));
+    }
   }
-
-  if (data?.skipped) {
-    log(`${job} skipped: ${data.reason || "no reason provided"}`);
-    return;
-  }
-
-  if (data?.postId) {
-    log(`${job} created post: ${data.postId}`);
-    const publicUrl = (process.env.BLOG_PUBLIC_URL || "https://radarlog.kr").replace(/\/$/, "");
-    const post = await fetchPost(baseUrl, apiKey, data.postId);
-    await notifyTelegram(publicUrl, post, data.postId);
-    return;
-  }
-
-  log(`${job} completed: ${JSON.stringify(body)}`);
 };
 
 run().catch((error) => {

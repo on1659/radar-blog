@@ -4,6 +4,32 @@
 
 ---
 
+## 2026-06-21 — AI Signal 발행 모니터 페이지
+
+사용자 요청: "글이 너무 늦게/불규칙하게 올라간다. 서버 켜지면 웹에서 잘 올리는지 확인하는 페이지 만들어줘." (ThreadsBot UI 참고)
+
+### 진단 (왜 늦고 불규칙한가)
+- launchd 스케줄: daily-ai :00/:30, claude-ai :15 → 매시 3회 시도.
+- 각 시도가 **게이트에 막혀 조용히 스킵**: daily-ai = `Hourly cap (n/6)` / `fresh items <2`, claude-ai = `Claude 글 2h 쿨다운`. 새 뉴스 소진 시 다음 뉴스 등장까지 스킵 → 본질적으로 버스티.
+- 추정 추가 원인: macOS launchd `StartCalendarInterval`은 **잠자는 동안 발화 안 됨**(깨어날 때 1회 합쳐 발화). "켜짐" ≠ "깨어있음" → 늦음/불규칙.
+- 그동안 시도/스킵은 로컬 launchd 로그에만 있어 웹에서 안 보였음.
+
+### 구현 (docs/goal/signal-publish-monitor.md)
+- **`PublishRun` 테이블 추가** — trigger 1회 = 1행 (job/status/reason/postId/durationMs/createdAt). prod DB에 `CREATE TABLE IF NOT EXISTS`로 surgical 적용(드리프트 위험 회피).
+- **두 trigger route**가 posted/skipped/failed + 사유 + 소요시간 기록. `recordPublishRun()`은 best-effort(try-catch)라 발행 흐름 무영향. 응답 계약 불변.
+- **`/admin/signal-monitor`** (admin 전용, force-dynamic): 워커 하트비트(최근 트리거 경과시간 <35m 정상/<70m 지연/그외 중단), 오늘 통계(발행/시도/스킵률), 오늘 스킵 사유 분류, 최근 발행 주기(글 간격·90분 초과 시 ⚠️), 트리거 기록 30개, 다음 예정 시각. 30초 자동 새로고침(client island). KST 표기.
+- admin 레이아웃에 "발행 모니터" 네비 추가.
+
+### 검증
+- `npm run build` 통과(신규 파일 경고 0). 페이지는 기존 admin 대시보드와 동일 렌더(`●` force-dynamic).
+- 워커 재시작(`worker.app` bootout/bootstrap) 후 `npm run auto:daily` 1회 → prod에 PublishRun 1행 기록 확인(`skipped: Only 1 fresh items`, 8357ms). end-to-end 로깅 동작.
+- commit 110c04d → master push(Railway 자동 배포).
+
+### 주의 / 다음 후보
+- **데이터 소스 한계:** trigger가 실제 도는 곳(로컬 워커)에서만 기록됨. GH Actions cron은 현재 `workflow_dispatch` 전용이라 Railway 노이즈 없음.
+- 페이지가 "중단됨"이면 Mac 절전/워커 종료 의심 → 절전 방지(`caffeinate`/`pmset`)는 이번 범위 밖(후속 과제).
+- "지금 발행" 버튼 미구현: radarlog.kr(Railway)는 로컬 워커(localhost)에 도달 못 하고 AI 키도 없어 불가 — 읽기 전용 모니터로 한정.
+
 ## 2026-06-15 (2) — AI 백엔드 Codex로 전환
 
 사용자 요청 "글 올릴 때는 코덱스 자원 쓰자" → shim 백엔드를 `claude -p`에서 **Codex**로 전환.

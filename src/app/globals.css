@@ -38,6 +38,11 @@
   --card-bg: #FFFFFF;
   --card-hover: #F7F8FA;
 
+  /* 커뮤니티 게시판 — memradar 인디고 악센트 (게시판 영역 전용) */
+  --board-accent: #6366F1;
+  --board-accent-dim: #4F46E5;
+  --board-accent-light: rgba(99, 102, 241, 0.12);
+
   /* 트랜지션 */
   --transition-fast: 0.15s ease;
   --transition-base: 0.2s ease;
@@ -67,6 +72,10 @@
 
   --card-bg: #212325;
   --card-hover: #2B2D31;
+
+  --board-accent: #7C83FF;
+  --board-accent-dim: #6366F1;
+  --board-accent-light: rgba(124, 131, 255, 0.16);
 }
 
 /* ===== Base Styles ===== */
@@ -142,6 +151,23 @@
 
   .code-block:hover .copy-button {
     opacity: 1;
+  }
+
+  /* 커뮤니티 관제실 배너 — 레이더 스윕. 게시판의 유일한 ambient 모션.
+     prefers-reduced-motion은 base layer의 전역 룰이 자동으로 정지시킨다. */
+  @keyframes boardRadarSweep {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .board-radar-sweep {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+    animation: boardRadarSweep 7s linear infinite;
   }
 }
 

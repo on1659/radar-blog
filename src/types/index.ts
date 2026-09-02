@@ -62,3 +62,66 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
 }
+
+// ===== Community Board (memradar 사용자 커뮤니티) =====
+
+export type BoardCategoryKey = "showcase" | "chat" | "question";
+
+export interface BoardAuthorDto {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
+}
+
+/** 목록 카드용 직렬화 메타 (Date는 ISO string) */
+export interface BoardPostMeta {
+  id: string;
+  category: BoardCategoryKey;
+  title: string;
+  excerpt: string;
+  imageId: string | null;
+  author: BoardAuthorDto;
+  createdAt: string;
+  commentCount: number;
+  reactionCount: number;
+}
+
+export interface BoardCommentDto {
+  id: string;
+  body: string;
+  createdAt: string;
+  author: BoardAuthorDto;
+}
+
+/** community 사전 블록 (ko.json/en.json과 키 동기) */
+export interface CommunityDict {
+  title: string;
+  subtitle: string;
+  signals: string;
+  write: string;
+  categoryAll: string;
+  categoryShowcase: string;
+  categoryChat: string;
+  categoryQuestion: string;
+  emptyTitle: string;
+  emptyBody: string;
+  loginTitle: string;
+  loginBody: string;
+  loginWithGitHub: string;
+  reLoginRequired: string;
+  comments: string;
+  commentPlaceholder: string;
+  submit: string;
+  delete: string;
+  deleteConfirm: string;
+  titlePlaceholder: string;
+  bodyPlaceholder: string;
+  imageDropHint: string;
+  imageRequired: string;
+  imageRemove: string;
+  uploading: string;
+  submitting: string;
+  backToList: string;
+  errorGeneric: string;
+  errorRateLimited: string;
+}

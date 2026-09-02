@@ -10,6 +10,7 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      githubId?: string;
       githubUsername?: string;
       isAdmin: boolean;
     };
@@ -18,6 +19,7 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
+    githubId?: string;
     githubUsername?: string;
     isAdmin?: boolean;
   }

@@ -168,3 +168,87 @@ enum Category {
   signal
   hallucination
 }
+
+// ===== Community Board (memradar 사용자 커뮤니티) =====
+// 블로그 모델과 완전 분리. 사용자 정체성은 GitHub 숫자 ID(불변)를 PK로 사용.
+
+enum BoardCategory {
+  showcase // 자랑 (이미지 중심)
+  chat     // 잡담
+  question // 질문
+}
+
+model BoardUser {
+  id        String   @id // GitHub 계정 숫자 ID (account.providerAccountId, 불변)
+  username  String // GitHub login (가변 — 쓰기 시마다 갱신)
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts     BoardPost[]
+  comments  BoardComment[]
+  reactions BoardReaction[]
+  images    BoardImage[]
+}
+
+model BoardPost {
+  id        String        @id @default(cuid())
+  category  BoardCategory
+  title     String
+  body      String // plain text만 저장 (HTML/마크다운 렌더 금지)
+  author    BoardUser     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  comments  BoardComment[]
+  reactions BoardReaction[]
+  images    BoardImage[]
+
+  @@index([category, createdAt])
+  @@index([createdAt])
+  @@index([authorId])
+}
+
+model BoardComment {
+  id        String    @id @default(cuid())
+  post      BoardPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  author    BoardUser @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  body      String
+  createdAt DateTime  @default(now())
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+}
+
+model BoardReaction {
+  id        String    @id @default(cuid())
+  post      BoardPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  user      BoardUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  emoji     String // 서버 화이트리스트 검증 (board.ts BOARD_EMOJIS)
+  createdAt DateTime  @default(now())
+
+  @@unique([postId, userId, emoji])
+  @@index([postId])
+}
+
+model BoardImage {
+  id         String     @id @default(cuid())
+  data       Bytes // bytea 원본 (2MB 캡, 매직바이트 검증 통과분만)
+  mimeType   String // image/png | image/jpeg | image/webp
+  size       Int
+  width      Int?
+  height     Int?
+  uploader   BoardUser  @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  uploaderId String
+  post       BoardPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId     String? // null = 아직 글에 연결 안 된 고아 (24h 후 기회적 스윕 대상)
+  createdAt  DateTime   @default(now())
+
+  @@index([postId])
+  @@index([uploaderId, createdAt])
+}

@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-09-02 — memradar 커뮤니티 게시판 v1 (/community)
+
+- **기능**: `/community` — memradar 사용자 커뮤니티 (자랑/잡담/질문, 갤러리 그리드, 이모지 리액션, 자체 댓글, 이미지 업로드)
+- **스키마**: `BoardCategory` enum + `BoardUser`/`BoardPost`/`BoardComment`/`BoardReaction`/`BoardImage` 5모델 append (기존 모델 무변경). 마이그레이션 SQL: `prisma/add-board.sql` (migrate diff로 생성, 순수 추가형). **프로덕션 DB 적용 완료 (2026-09-02, prisma db execute)** — migrate diff 정합 확인
+- **인증**: `auth.ts` jwt 콜백에 GitHub `account.providerAccountId` → `token.githubId` 보존 (승인 게이트 통과). Credentials 관리자 경로 무변경. 구 GitHub 세션은 githubId 부재 → 쓰기 API가 403 `GITHUB_LOGIN_REQUIRED` → 재로그인 UX
+- **이미지**: DB(bytea) 저장. 클라 canvas 다운스케일(긴 변 1600px, webp) → 서버 매직바이트 검증(SVG/GIF 거부) → 2MB 캡. 서빙 `GET /api/board/images/[id]` (immutable 캐시 + nosniff). 고아 정리: 업로드 진입 시 24h 지난 미연결 deleteMany + 유저당 미연결 5장 캡. R2 전환 트리거: 테이블 >500MB
+- **API**: `api/board/*` 7종 (images POST/GET, posts POST/DELETE, comments POST/DELETE, reactions POST 토글). `{success,data,error}` 포맷. 인메모리 토큰버킷 rate limit (`src/lib/rate-limit.ts`, 단일 replica 전제). 읽기는 Server Component에서 prisma 직접 호출
+- **페이지**: `[locale]/community`(목록)·`[id]`(상세)·`write`(작성) — 전부 `force-dynamic` (revalidatePath는 ko 무프리픽스 rewrite 때문에 미사용, 주석 참조). 본문은 plain text + React 엘리먼트 조립 autolink (`PlainTextBody`) — sanitizer 부재 환경에서 XSS 원천 차단
+- **디자인**: 하이브리드 — 블로그 골격 + 게시판 영역 한정 memradar 인디고 악센트(`--board-accent`, globals.css+tailwind 동시 추가). 시그니처는 관제실 배너(고정 다크 + 레이더 스윕 `.board-radar-sweep`, reduced-motion 자동 정지). 3단 갤러리 그리드는 신규 패턴
+- **리팩터**: `PostItem.tsx`의 `getRelativeTime` → `src/lib/relative-time.ts` 추출 (기능 동일)
+- **검증**: tsc/lint 통과, dev 스모크(ko/en 렌더, 비로그인 401, 이미지 404) 통과
+- **주의**: `.env` DATABASE_URL이 프로덕션 Railway DB 직결 — db push가 곧 프로덕션 변경임. DB에서 발견된 `PublishRun` 드리프트는 원격 rebase(발행 모니터 커밋)로 스키마에 합류하며 해소
+
 ## 2026-06-21 — AI Signal 발행 모니터 페이지
 
 사용자 요청: "글이 너무 늦게/불규칙하게 올라간다. 서버 켜지면 웹에서 잘 올리는지 확인하는 페이지 만들어줘." (ThreadsBot UI 참고)

@@ -33,6 +33,11 @@ const config: Config = {
           casual: "#FF6B35",
           signal: "#06B6D4",
         },
+        board: {
+          accent: "var(--board-accent)",
+          "accent-dim": "var(--board-accent-dim)",
+          "accent-light": "var(--board-accent-light)",
+        },
         code: {
           bg: "var(--code-bg)",
           text: "var(--code-text)",

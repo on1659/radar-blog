@@ -26,8 +26,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, profile }) {
+    async jwt({ token, user, profile, account }) {
       if (user?.isAdmin) token.isAdmin = true;
+      if (account?.provider === "github") token.githubId = account.providerAccountId;
       if (profile) token.githubUsername = profile.login;
       if (token.githubUsername === process.env.ADMIN_GITHUB_ID) token.isAdmin = true;
       return token;
@@ -37,6 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         ...session,
         user: {
           ...session.user,
+          githubId: token.githubId as string | undefined,
           githubUsername: token.githubUsername as string | undefined,
           isAdmin: token.isAdmin as boolean ?? false,
         },

@@ -4,6 +4,7 @@
     "projects": "Projects",
     "about": "About",
     "docs": "Docs",
+    "community": "Community",
     "search": "Search",
     "language": "KO"
   },
@@ -72,5 +73,36 @@
   "common": {
     "readMore": "Read More",
     "goBack": "Go Back"
+  },
+  "community": {
+    "title": "Community",
+    "subtitle": "Show-and-tell for memradar users",
+    "signals": "{n} signals received",
+    "write": "Write",
+    "categoryAll": "All",
+    "categoryShowcase": "Showcase",
+    "categoryChat": "Chat",
+    "categoryQuestion": "Q&A",
+    "emptyTitle": "No signals on the radar yet",
+    "emptyBody": "Be the first to share your story",
+    "loginTitle": "Join with your GitHub account",
+    "loginBody": "Sign-in is only needed to write, comment, and react. Browsing is free.",
+    "loginWithGitHub": "Continue with GitHub",
+    "reLoginRequired": "Please sign in with GitHub again",
+    "comments": "Comments",
+    "commentPlaceholder": "Leave a comment",
+    "submit": "Post",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this? It can't be undone.",
+    "titlePlaceholder": "Title",
+    "bodyPlaceholder": "Tell your story",
+    "imageDropHint": "Drag your Wrapped card or screenshot here, or click to upload",
+    "imageRequired": "Showcase posts need an image",
+    "imageRemove": "Remove image",
+    "uploading": "Uploading...",
+    "submitting": "Posting...",
+    "backToList": "Back to list",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorRateLimited": "Too many requests. Please try again in a moment."
   }
 }

@@ -4,6 +4,7 @@
     "projects": "Projects",
     "about": "About",
     "docs": "Docs",
+    "community": "커뮤니티",
     "search": "검색",
     "language": "EN"
   },
@@ -72,5 +73,36 @@
   "common": {
     "readMore": "더 보기",
     "goBack": "돌아가기"
+  },
+  "community": {
+    "title": "커뮤니티",
+    "subtitle": "memradar 사용자들의 자랑과 수다",
+    "signals": "수신된 신호 {n}",
+    "write": "글쓰기",
+    "categoryAll": "전체",
+    "categoryShowcase": "자랑",
+    "categoryChat": "잡담",
+    "categoryQuestion": "질문",
+    "emptyTitle": "아직 레이더에 잡힌 신호가 없어요",
+    "emptyBody": "첫 번째 이야기를 올려주세요",
+    "loginTitle": "GitHub 계정으로 참여할 수 있어요",
+    "loginBody": "글쓰기, 댓글, 리액션에만 로그인이 필요해요. 구경은 자유예요.",
+    "loginWithGitHub": "GitHub로 계속하기",
+    "reLoginRequired": "GitHub로 다시 로그인해 주세요",
+    "comments": "댓글",
+    "commentPlaceholder": "댓글을 남겨주세요",
+    "submit": "등록",
+    "delete": "삭제",
+    "deleteConfirm": "정말 삭제할까요? 되돌릴 수 없어요.",
+    "titlePlaceholder": "제목",
+    "bodyPlaceholder": "이야기를 들려주세요",
+    "imageDropHint": "Wrapped 카드나 스크린샷을 끌어다 놓거나 클릭해서 올려주세요",
+    "imageRequired": "자랑 글에는 이미지가 필요해요",
+    "imageRemove": "이미지 제거",
+    "uploading": "올리는 중...",
+    "submitting": "등록하는 중...",
+    "backToList": "목록으로",
+    "errorGeneric": "문제가 생겼어요. 다시 시도해 주세요.",
+    "errorRateLimited": "요청이 너무 잦아요. 잠시 후 다시 시도해 주세요."
   }
 }

@@ -13,6 +13,7 @@ interface NavDict {
   projects: string;
   about: string;
   docs: string;
+  community: string;
   search: string;
   language: string;
 }
@@ -30,6 +31,7 @@ export const NavBar = ({ locale, dict, isAdmin = false }: { locale: Locale; dict
     { label: dict.blog, href: `${prefix}/` },
     { label: dict.projects, href: `${prefix}/about#projects` },
     { label: dict.docs, href: `${prefix}/docs` },
+    { label: dict.community, href: `${prefix}/community` },
   ];
 
   const isActive = (href: string) => {

@@ -23,6 +23,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      // GitHub이 2026-04 RFC 9207 롤아웃으로 콜백에 iss 파라미터를 실어 보내기 시작함.
+      // provider에 issuer를 명시하지 않으면 Auth.js가 플레이스홀더(authjs.dev)와 비교하다
+      // "unexpected iss" 로 콜백이 실패한다. GitHub이 보내는 값과 정확히 일치시킨다.
+      issuer: "https://github.com/login/oauth",
     }),
   ],
   callbacks: {

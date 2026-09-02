@@ -124,4 +124,9 @@ export interface CommunityDict {
   backToList: string;
   errorGeneric: string;
   errorRateLimited: string;
+  viewGrid: string;
+  viewList: string;
 }
+
+/** 목록 보기 방식 — 썸네일 갤러리(grid) / 글 리스트(list) */
+export type BoardViewMode = "grid" | "list";

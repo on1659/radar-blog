@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { BOARD_CATEGORY_DOTS } from "./BoardCard";
-import type { BoardCategoryKey, CommunityDict } from "@/types";
+import type { BoardCategoryKey, BoardViewMode, CommunityDict } from "@/types";
 
-/** URL 쿼리 기반 필터 칩 — 클라이언트 JS 없이 Link로 동작 */
+/** URL 쿼리 기반 필터 칩 — 클라이언트 JS 없이 Link로 동작. 현재 보기 방식(view)은 보존한다. */
 export const CategoryTabs = ({
   dict,
   prefix,
   current,
+  view,
 }: {
   dict: CommunityDict;
   prefix: string;
   current: "all" | BoardCategoryKey;
+  view: BoardViewMode;
 }) => {
   const tabs: { key: "all" | BoardCategoryKey; label: string }[] = [
     { key: "all", label: dict.categoryAll },
@@ -19,12 +21,19 @@ export const CategoryTabs = ({
     { key: "question", label: dict.categoryQuestion },
   ];
 
+  const buildHref = (key: "all" | BoardCategoryKey) => {
+    const params = new URLSearchParams();
+    if (key !== "all") params.set("category", key);
+    if (view === "list") params.set("view", "list");
+    const qs = params.toString();
+    return qs ? `${prefix}/community?${qs}` : `${prefix}/community`;
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       {tabs.map((tab) => {
         const active = current === tab.key;
-        const href =
-          tab.key === "all" ? `${prefix}/community` : `${prefix}/community?category=${tab.key}`;
+        const href = buildHref(tab.key);
         return (
           <Link
             key={tab.key}

@@ -103,6 +103,8 @@
     "submitting": "등록하는 중...",
     "backToList": "목록으로",
     "errorGeneric": "문제가 생겼어요. 다시 시도해 주세요.",
-    "errorRateLimited": "요청이 너무 잦아요. 잠시 후 다시 시도해 주세요."
+    "errorRateLimited": "요청이 너무 잦아요. 잠시 후 다시 시도해 주세요.",
+    "viewGrid": "썸네일로 보기",
+    "viewList": "글로 보기"
   }
 }

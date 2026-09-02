@@ -5,12 +5,14 @@ import { getDictionary } from "@/i18n";
 import { i18n, isValidLocale } from "@/i18n/config";
 import { BoardBanner } from "@/components/board/BoardBanner";
 import { BoardCard } from "@/components/board/BoardCard";
+import { BoardListItem } from "@/components/board/BoardListItem";
 import { CategoryTabs } from "@/components/board/CategoryTabs";
+import { ViewToggle } from "@/components/board/ViewToggle";
 import { RadarEmblem } from "@/components/board/RadarEmblem";
 import { Pagination } from "@/components/home/Pagination";
 import { BOARD_PAGE_SIZE, isBoardCategory } from "@/lib/board";
 import type { Locale } from "@/i18n/config";
-import type { BoardCategoryKey, BoardPostMeta } from "@/types";
+import type { BoardCategoryKey, BoardPostMeta, BoardViewMode } from "@/types";
 
 // 게시판은 최신성이 우선이라 항상 동적 렌더링한다.
 // revalidatePath는 ko 무프리픽스 rewrite(/community → /ko/community)와 얽혀
@@ -33,7 +35,7 @@ const CommunityPage = async ({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ category?: string; page?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; view?: string }>;
 }) => {
   const { locale: rawLocale } = await params;
   const locale: Locale = isValidLocale(rawLocale) ? rawLocale : i18n.defaultLocale;
@@ -44,6 +46,7 @@ const CommunityPage = async ({
   const category: "all" | BoardCategoryKey =
     sp.category && isBoardCategory(sp.category) ? sp.category : "all";
   const pageNum = Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1);
+  const view: BoardViewMode = sp.view === "list" ? "list" : "grid";
 
   const where = category === "all" ? {} : { category };
   const result = await prisma
@@ -90,7 +93,16 @@ const CommunityPage = async ({
     <>
       <BoardBanner dict={dict.community} prefix={prefix} totalCount={totalSignals} />
       <div className="mx-auto max-w-container px-5 pb-16 pt-6 sm:px-8">
-        <CategoryTabs dict={dict.community} prefix={prefix} current={category} />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CategoryTabs dict={dict.community} prefix={prefix} current={category} view={view} />
+          <ViewToggle
+            dict={dict.community}
+            prefix={prefix}
+            current={view}
+            category={category}
+            page={pageNum}
+          />
+        </div>
 
         {posts.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
@@ -106,19 +118,38 @@ const CommunityPage = async ({
           </div>
         ) : (
           <>
-            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
-                <BoardCard
-                  key={post.id}
-                  post={post}
-                  dict={dict.community}
-                  prefix={prefix}
-                  locale={locale}
-                />
-              ))}
-            </div>
+            {view === "list" ? (
+              <div className="mt-4">
+                {posts.map((post) => (
+                  <BoardListItem
+                    key={post.id}
+                    post={post}
+                    dict={dict.community}
+                    prefix={prefix}
+                    locale={locale}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {posts.map((post) => (
+                  <BoardCard
+                    key={post.id}
+                    post={post}
+                    dict={dict.community}
+                    prefix={prefix}
+                    locale={locale}
+                  />
+                ))}
+              </div>
+            )}
             {totalPages > 1 && (
-              <Pagination currentPage={pageNum} totalPages={totalPages} category={category} />
+              <Pagination
+                currentPage={pageNum}
+                totalPages={totalPages}
+                category={category}
+                extraParams={view === "list" ? { view: "list" } : undefined}
+              />
             )}
           </>
         )}

@@ -103,6 +103,8 @@
     "submitting": "Posting...",
     "backToList": "Back to list",
     "errorGeneric": "Something went wrong. Please try again.",
-    "errorRateLimited": "Too many requests. Please try again in a moment."
+    "errorRateLimited": "Too many requests. Please try again in a moment.",
+    "viewGrid": "Gallery view",
+    "viewList": "List view"
   }
 }

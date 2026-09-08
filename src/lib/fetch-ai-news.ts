@@ -543,8 +543,11 @@ export const fetchClaudeNews = async (): Promise<RawSignalItem[]> => {
     fetchRSSFeeds(),
   ]);
 
-  // Anthropic 전용 소스는 전부 포함
-  const dedicated = [...anthropic, ...claudeRss];
+  // Anthropic 공식 소스는 전부 포함, Claude RSS(Simon Willison 전체 피드)는 키워드 필터 적용
+  const filteredClaudeRss = claudeRss.filter(
+    (item) => matchesClaudeKeyword(item.title) || (item.summary && matchesClaudeKeyword(item.summary))
+  );
+  const dedicated = [...anthropic, ...filteredClaudeRss];
 
   // 일반 소스에서 Claude/Anthropic 관련만 필터
   const generalClaude = [...hn, ...reddit, ...rss].filter(
@@ -555,7 +558,7 @@ export const fetchClaudeNews = async (): Promise<RawSignalItem[]> => {
   const deduped = dedup(all);
 
   console.log(
-    `[Claude News] Collected: Anthropic=${anthropic.length}, ClaudeRSS=${claudeRss.length}, ` +
+    `[Claude News] Collected: Anthropic=${anthropic.length}, ClaudeRSS=${filteredClaudeRss.length}/${claudeRss.length}, ` +
     `GeneralClaude=${generalClaude.length}, Total=${all.length}, After dedup=${deduped.length}`
   );
 

@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-09-09 — Claude 전용 파이프라인 오귀속 버그 수정
+
+### 문제
+자동 생성 요청으로 전달된 뉴스 2건(OpenAI Navier-Stokes 수학 성과, ChatGPT Sketch)이 소스 라벨 `[Claude: The Verge AI]`를 달고 "Claude/Anthropic 중심 분석" 프롬프트로 들어옴 — Claude와 무관한 OpenAI 소식이 Anthropic 이야기로 오귀속될 뻔함. JSON 생성을 거부하고 원인 조사.
+
+### 원인
+`signal-sources.ts`의 `CLAUDE_RSS_FEEDS`는 Anthropic 공식 RSS가 없어 대신 쓰는 일반 AI 피드(Ars Technica AI, The Verge AI) 포함. `fetch-ai-news.ts`의 `fetchClaudeRSS()`는 이 피드의 모든 아이템에 무조건 `source: "Claude: ${feed.name}"` 라벨을 붙이고, (수정 전) `fetchClaudeNews()`가 키워드 필터 없이 전부 `dedicated`(무조건 포함)에 합류시켜 OpenAI 전용 기사도 Claude 소식으로 흘러들어감.
+
+### 수정
+`fetch-ai-news.ts:fetchClaudeNews` — `claudeRss`도 `generalClaude`와 동일하게 `matchesClaudeKeyword`(title/summary) 필터 적용 후 `dedicated`에 합류하도록 변경. tsc/lint 통과. commit `eaa7339`, push 완료.
+
+### 확인 필요 (다음 세션)
+- 이 버그가 언제부터 있었는지 불명 — 과거 발행된 Claude 전용 글 중 오귀속 사례가 있는지 SignalItem/Post 테이블 스팟체크 필요.
+- 프로젝트에 테스트 러너 자체가 없음(`package.json`에 test script 부재, `*.test.ts` 0개) — CLAUDE.md 테스트 규칙(소스별 3가지 입력 테스트)이 지켜지지 않고 있음. 테스트 인프라 구축은 범위 밖이라 보류, 별도 세션 필요.
+
 ## 2026-09-02 — memradar 커뮤니티 게시판 v1 (/community)
 
 - **기능**: `/community` — memradar 사용자 커뮤니티 (자랑/잡담/질문, 갤러리 그리드, 이모지 리액션, 자체 댓글, 이미지 업로드)

@@ -493,7 +493,7 @@ const fetchClaudeRSS = async (): Promise<RawSignalItem[]> => {
 
 /* ───── Claude 키워드 매칭 (일반 소스에서 Claude 관련 필터) ───── */
 
-const matchesClaudeKeyword = (text: string): boolean => {
+export const matchesClaudeKeyword = (text: string): boolean => {
   const lower = text.toLowerCase();
   return CLAUDE_KEYWORDS.some((kw) => lower.includes(kw));
 };

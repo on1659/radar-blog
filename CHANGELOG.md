@@ -19,6 +19,15 @@
 - 이 버그가 언제부터 있었는지 불명 — 과거 발행된 Claude 전용 글 중 오귀속 사례가 있는지 SignalItem/Post 테이블 스팟체크 필요.
 - 프로젝트에 테스트 러너 자체가 없음(`package.json`에 test script 부재, `*.test.ts` 0개) — CLAUDE.md 테스트 규칙(소스별 3가지 입력 테스트)이 지켜지지 않고 있음. 테스트 인프라 구축은 범위 밖이라 보류, 별도 세션 필요.
 
+### 후속 수정 — 이중 방어 (DB 잔존 오염 행 재검증)
+
+`fetchClaudeNews()` 필터를 고쳐도, **수정 전에 이미 upsert된 오염 행**(Simon Willison 전체 피드/Ars Technica AI에서 키워드 필터 없이 들어온 항목)이 `SignalItem` 테이블에 `usedInPost: null`로 남아있으면 `generateClaudePost()`가 DB에서 재조회할 때(`fetchedAt` 72h 이내, `externalId: "claude:*"`) 그대로 다시 뽑혀나옴 — fetch 단 필터만으로는 방어가 안 되는 구조.
+
+- `fetch-ai-news.ts`: `matchesClaudeKeyword`를 `export`로 전환.
+- `generate-daily-ai.ts:generateClaudePost` — DB에서 뽑은 `dbItems`를 바로 쓰지 않고 `matchesClaudeKeyword(title/summary)`로 재필터링한 `freshItems`만 사용. 걸러진 행은 `console.warn`으로 제목 로깅, skip 사유 문자열에 `staleFiltered=N` 추가해 관측 가능하게 함. DB 삭제/정리는 하지 않음 — 오염 행은 계속 남지만 프롬프트에는 다시는 안 들어감.
+- `npx tsc --noEmit`, `npm run build` 통과.
+- **DB 정리(별도 과제, 미실행)**: `externalId LIKE 'claude:%'` AND `usedInPost IS NULL`인 기존 행 중 키워드 매칭 안 되는 것 정리. 로컬에 `DATABASE_URL`이 없어 이번 세션에서 스팟체크/정리 불가 — 위 "확인 필요" 항목과 동일 건, 프로덕션 DB 접근 가능한 세션에서 이어서.
+
 ## 2026-09-02 — memradar 커뮤니티 게시판 v1 (/community)
 
 - **기능**: `/community` — memradar 사용자 커뮤니티 (자랑/잡담/질문, 갤러리 그리드, 이모지 리액션, 자체 댓글, 이미지 업로드)

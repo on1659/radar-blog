@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import OpenAI from "openai";
 import { prisma, nextSlug, createPostWithSlug } from "./prisma";
 import { calculateReadingTime } from "./markdown";
-import { fetchAINews, fetchClaudeNews } from "./fetch-ai-news";
+import { fetchAINews, fetchClaudeNews, matchesClaudeKeyword } from "./fetch-ai-news";
 import { getAIConfig } from "./claude";
 import { getWritingStyle, buildSystemPrompt } from "@/config/writing-style";
 import { validatePost, logValidation, buildFailureBanner } from "./post-validator";
@@ -331,7 +331,7 @@ export const generateClaudePost = async (): Promise<{
   console.log(`[Claude Post] Upsert: ${upsertOk} ok, ${upsertFail} fail`);
 
   // DB에서 Claude 전용 미사용 아이템 조회
-  const freshItems = await prisma.signalItem.findMany({
+  const dbItems = await prisma.signalItem.findMany({
     where: {
       usedInPost: null,
       fetchedAt: { gte: new Date(Date.now() - 72 * 60 * 60 * 1000) },
@@ -340,6 +340,18 @@ export const generateClaudePost = async (): Promise<{
     orderBy: { score: "desc" },
     take: 10,
   });
+
+  // 이중 방어: fetch 시점 필터가 바뀌기 전 upsert된 오염 행이 DB에 남아있을 수 있으므로 재검증
+  const freshItems = dbItems.filter(
+    (item) => matchesClaudeKeyword(item.title) || (!!item.summary && matchesClaudeKeyword(item.summary))
+  );
+  const staleCount = dbItems.length - freshItems.length;
+  if (staleCount > 0) {
+    console.warn(
+      `[Claude Post] Dropped ${staleCount} stale DB item(s) that no longer match Claude keywords: ` +
+      dbItems.filter((i) => !freshItems.includes(i)).map((i) => i.title.slice(0, 40)).join(" | ")
+    );
+  }
 
   console.log(`[Claude Post] Fresh items: ${freshItems.length}, titles: ${freshItems.map((i) => i.title.slice(0, 40)).join(" | ")}`);
 
@@ -350,7 +362,7 @@ export const generateClaudePost = async (): Promise<{
     return {
       postId: null,
       skipped: true,
-      reason: `0 fresh Claude items (fetched=${news.length}, upsertOk=${upsertOk}, upsertFail=${upsertFail}, dbTotal=${allClaude}, dbUsed=${usedClaude})`,
+      reason: `0 fresh Claude items (fetched=${news.length}, upsertOk=${upsertOk}, upsertFail=${upsertFail}, dbTotal=${allClaude}, dbUsed=${usedClaude}, staleFiltered=${staleCount})`,
     };
   }
 

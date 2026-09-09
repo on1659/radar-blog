@@ -53,11 +53,13 @@ export const CLAUDE_RSS_FEEDS = [
   { name: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" },
 ];
 
+// mcp/model context protocol/artifacts/rlhf는 제외: claude/anthropic과 같이 안 나오면
+// 무관 기사(ChatGPT, 일반 보안 기사 등)도 통과시키는 범용어이고, 같이 나오는 경우엔 어차피
+// "claude"/"anthropic" 키워드가 매칭되므로 참 긍정에 기여하지 않고 거짓 긍정만 늘림.
 export const CLAUDE_KEYWORDS = [
   "claude", "anthropic", "claude code", "claude sonnet", "claude opus",
-  "claude haiku", "mcp", "model context protocol", "artifacts",
-  "claude api", "claude desktop", "claude mobile",
-  "constitutional ai", "rlhf", "claude 4", "claude 3",
+  "claude haiku", "claude api", "claude desktop", "claude mobile",
+  "constitutional ai", "claude 4", "claude 3",
 ];
 
 /* ───── AI 키워드 필터 ───── */

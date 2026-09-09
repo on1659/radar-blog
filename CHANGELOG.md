@@ -28,6 +28,15 @@
 - `npx tsc --noEmit`, `npm run build` 통과.
 - **DB 정리(별도 과제, 미실행)**: `externalId LIKE 'claude:%'` AND `usedInPost IS NULL`인 기존 행 중 키워드 매칭 안 되는 것 정리. 로컬에 `DATABASE_URL`이 없어 이번 세션에서 스팟체크/정리 불가 — 위 "확인 필요" 항목과 동일 건, 프로덕션 DB 접근 가능한 세션에서 이어서.
 
+### 후속 수정 2 — CLAUDE_KEYWORDS 범용어 제거 (근본 원인)
+
+이중 방어까지 넣었는데도 다음 실행에서 또 오귀속 위험 발생: 이번엔 OpenAI "Navier-Stokes"/"ChatGPT Images" 기사와 Ars Technica MS 패치 화요일 기사가 `[Claude: ...]` 라벨을 달고 들어옴. 원인이 fetch 시점 필터가 아니라 **필터가 참조하는 키워드 목록 자체**에 있었음 — 자동 생성 파이프라인(로컬 워커, [[auto-publish-local-worker]])이 이번에도 JSON 생성을 거부하고 원인 진단까지 스스로 마친 상태로 대기 중이었고, 인터랙티브 세션에서 이어받아 처리.
+
+- `signal-sources.ts:CLAUDE_KEYWORDS`에서 `mcp`, `model context protocol`, `artifacts`, `rlhf` 제거. 이 단어들은 `claude`/`anthropic`과 같이 안 나오면 무관 기사도 통과시키고, 같이 나오면 이미 `claude`/`anthropic` 키워드가 매칭되므로 참 긍정에 기여하지 않는 죽은 가지였음 — 즉 거짓 긍정만 유발.
+- `constitutional ai`는 Anthropic 고유 용어라 유지.
+- `npx tsc --noEmit`, `npm run build` 통과.
+- 이번 요청 원문 3건 중 2건("Introducing ChatGPT Images 2.5" = OpenAI/ChatGPT, Ars Technica MS 패치 화요일 기사)은 Claude/Anthropic과 무관했고 필터 통과로 오귀속될 뻔했음. 나머지 1건(Navier-Stokes)은 파이프라인이 Claude/Anthropic 관련으로 판단했으나 원문 전체를 이 세션에서 직접 재검증하진 않음 — 다음 실행에서 필터 통과 여부와 실제 관련성을 재확인 필요. 부정확한 콘텐츠 생성 대신 필터 수정으로 대응, 이번 배치 글 생성은 스킵.
+
 ## 2026-09-02 — memradar 커뮤니티 게시판 v1 (/community)
 
 - **기능**: `/community` — memradar 사용자 커뮤니티 (자랑/잡담/질문, 갤러리 그리드, 이모지 리액션, 자체 댓글, 이미지 업로드)

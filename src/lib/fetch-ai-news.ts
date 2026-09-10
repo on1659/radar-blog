@@ -234,13 +234,18 @@ const fetchAnthropicNews = async (): Promise<RawSignalItem[]> => {
 
     const html = await res.text();
 
-    // 이스케이프된 slug에서 직접 추출: current\":\"slug-name
+    // 이스케이프된 slug에서 직접 추출: current\":\"slug-name (위치 기록 — 기사 경계 판단에 사용)
     const slugPattern = /current\\":\\"([a-z0-9-]+)/g;
-    const slugs: string[] = [];
+    const slugOccurrences: { slug: string; index: number }[] = [];
+    const seenSlugs = new Set<string>();
     let slugMatch;
     while ((slugMatch = slugPattern.exec(html)) !== null) {
-      if (!slugs.includes(slugMatch[1])) slugs.push(slugMatch[1]);
+      if (!seenSlugs.has(slugMatch[1])) {
+        seenSlugs.add(slugMatch[1]);
+        slugOccurrences.push({ slug: slugMatch[1], index: slugMatch.index });
+      }
     }
+    const slugs = slugOccurrences.map((s) => s.slug);
 
     // 이스케이프된 publishedOn 추출: publishedOn\":\"2026-03-12T14:39:00.000Z
     const pubPattern = /publishedOn\\":\\"(\d{4}-\d{2}-\d{2}T[^\\]+)/g;
@@ -251,17 +256,17 @@ const fetchAnthropicNews = async (): Promise<RawSignalItem[]> => {
     }
 
     // 이스케이프된 title 추출 — slug 근처에서 title 찾기
-    // 전체 HTML에서 slug 위치 기반으로 청크 추출 후 매칭
+    // 청크 경계를 이웃 slug 위치로 제한 (고정 ±1000자 윈도우는 이웃 기사가
+    // 가까이 있을 때 그 기사의 title을 대신 잡아버리는 오귀속을 유발함)
     const articles: AnthropicArticle[] = [];
     const seen = new Set<string>();
 
-    for (const slug of slugs) {
-      const slugIdx = html.indexOf(`current\\":\\"${slug}\\"`);
-      if (slugIdx === -1) continue;
-
-      // slug 주변 2000자에서 publishedOn, title 추출
-      const start = Math.max(0, slugIdx - 1000);
-      const end = Math.min(html.length, slugIdx + 1000);
+    for (let i = 0; i < slugOccurrences.length; i++) {
+      const { slug, index: slugIdx } = slugOccurrences[i];
+      const prevIdx = i > 0 ? slugOccurrences[i - 1].index : 0;
+      const nextIdx = i < slugOccurrences.length - 1 ? slugOccurrences[i + 1].index : html.length;
+      const start = Math.max(prevIdx, slugIdx - 1000);
+      const end = Math.min(nextIdx, slugIdx + 1000);
       const chunk = html.slice(start, end);
 
       const datM = chunk.match(/publishedOn\\":\\"(\d{4}-\d{2}-\d{2}T[^\\]+)/);

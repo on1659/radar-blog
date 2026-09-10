@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-09-10 — Anthropic News 스크래퍼 title 오귀속 버그 수정 (근본 원인)
+
+### 문제
+자동 생성 요청 JSON 원문에서 2번("How Claude's text watermark works", slug `claude-text-watermark`)과 3번(slug `claude-opus-5`) 항목이 제목은 완전히 동일한데 URL만 다름. 실제로는 3번이 Opus 5 출시 소식인데 워터마크 기사로 오서술될 뻔함. JSON 생성을 거부하고 원인 조사 — [[auto-publish-local-worker]] 파이프라인이 아니라 사용자가 직접 인터랙티브 세션에서 진단·수정.
+
+### 원인
+`fetch-ai-news.ts:fetchAnthropicNews()` — Anthropic이 공식 RSS를 안 줘서 `anthropic.com/news`의 인라인 JSON을 정규식으로 긁는 구조. 각 slug 위치 기준 **고정 ±1000자 윈도우** 안에서 `title\":\"...` 패턴에 첫 매칭되는 것을 그 slug의 title로 사용했는데, 두 기사가 페이지 JSON 배열에서 가깝게 위치하면 이 윈도우가 자기 title이 아니라 이웃 기사의 title을 잡아버림. `claude-opus-5`가 이웃인 `claude-text-watermark`의 title을 잘못 가져온 것이 이번 사례. 09-09 세션의 오귀속 수정(CLAUDE_KEYWORDS 정리, DB 이중 방어)은 전부 필터 단 대응이었고 이 스크래퍼의 추출 로직 자체는 그때 손대지 않았음 — 이번이 그 근본 원인 수정.
+
+### 수정
+- 슬러그를 찾을 때 위치(index)까지 함께 기록(`slugOccurrences`)하도록 변경.
+- title/publishedOn 추출 청크의 경계를 고정 폭이 아니라 **이웃 슬러그의 위치**로 제한 (`start = max(prevSlugIdx, slugIdx-1000)`, `end = min(nextSlugIdx, slugIdx+1000)`) — 청크가 절대 이웃 기사 객체를 침범하지 않도록 함.
+- `npx tsc --noEmit`, `npm run build` 통과. 두 기사가 인접한 상황을 재현한 합성 HTML로 수정 전/후 동작 차이를 수동 검증(임시 스크립트, 커밋 안 함) — 수정 후 각 slug가 정확히 자기 title을 반환함을 확인.
+- 이번 배치 글 생성은 스킵(부정확한 콘텐츠 생성 대신 근본 원인 수정으로 대응 — 기존 관례와 동일).
+
+### 확인 필요 (다음 세션)
+- 이 버그로 인해 과거 발행된 Anthropic News 소스 글 중 오귀속 사례가 있는지 SignalItem/Post 테이블 스팟체크 필요 (09-09 세션과 동일한 미해결 과제).
+- 프로젝트에 테스트 러너가 없다는 문제(09-09 세션 기록)는 이번에도 미해결 — 정식 회귀 테스트 대신 수동 스크립트 검증으로 대체함.
+
 ## 2026-09-09 — Claude 전용 파이프라인 오귀속 버그 수정
 
 ### 문제
